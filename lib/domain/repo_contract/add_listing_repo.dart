@@ -1,0 +1,7 @@
+import 'package:dartz/dartz.dart';
+import 'package:real_their/core/reusable_components/property.dart';
+import 'package:real_their/domain/entitys/property_entity.dart';
+
+abstract class AddListingRepo{
+  Future<Either<PropertyEntity,String>> addListing(Property property);
+}
