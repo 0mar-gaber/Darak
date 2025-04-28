@@ -1,4 +1,5 @@
 import 'package:dartz/dartz.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:injectable/injectable.dart';
 import 'package:real_their/core/reusable_components/property.dart';
 import 'package:real_their/data/data_contract/add_listing_contract.dart';
@@ -13,8 +14,8 @@ class AddListingRepoImpl extends AddListingRepo {
   AddListingRepoImpl(this.contract);
 
   @override
-  Future<Either<PropertyEntity, String>> addListing(Property property) async {
-    var result = await contract.addListing(property);
+  Future<Either<PropertyEntity, String>> addListing(Property property ,List<XFile>? images) async {
+    var result = await contract.addListing(property,images);
     return result.fold((response) {
       PropertyEntity pro = PropertyEntity(
         id: response.id,

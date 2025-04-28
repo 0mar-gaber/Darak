@@ -68,7 +68,7 @@ class _WishlistTabState extends State<WishlistTab> {
           padding: REdgeInsets.only(
               top: 21.h, left: 34.w, right: 34.w, bottom: 20.h),
           sliver: SliverGrid.builder(
-              itemBuilder: (context, index) => RecommendForYouWidget(id: index,),
+              itemBuilder: (context, index) => RecommendForYouWidget(id: index, imageUrl: '', title: '', location: '', priceFormatted: '',area: '',),
               itemCount: 10,
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,

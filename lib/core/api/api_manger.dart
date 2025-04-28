@@ -18,7 +18,6 @@ class ApiManager {
       ),
     );
 
-    // تجاوز التحقق من SSL (للاختبار فقط)
     (dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate =
         (HttpClient client) {
       client.badCertificateCallback = (X509Certificate cert, String host, int port) => true;
@@ -51,15 +50,37 @@ class ApiManager {
 
   Future<Response> postRequest({
     required String endPoint,
-    Map<String, dynamic>? body,
+    required Map<String, dynamic> body,
     bool isFormData = false,
-    String? token, // ✅ دعم التوكن
+    List<XFile>? images,  // إضافة متغير images لتحمل صور متعددة
+    String? token,  // ✅ دعم التوكن
   }) async {
     try {
       dynamic dataToSend = body;
 
-      if (isFormData && body != null) {
-        dataToSend = FormData.fromMap(body);
+      // إذا كانت البيانات تحتاج إلى أن تكون في شكل form-data
+      if (isFormData) {
+        // إضافة الصور إلى FormData
+        FormData formData = FormData();
+
+        // أضف البيانات الأخرى إلى FormData
+        body.forEach((key, value) {
+          formData.fields.add(MapEntry(key, value.toString()));
+        });
+
+        // أضف الصور إلى FormData
+        if (images != null) {
+          for (var image in images) {
+            String fileName = image.path.split('/').last;
+            formData.files.add(MapEntry(
+              'files',  // اسم الحقل في الـ API
+              await MultipartFile.fromFile(image.path, filename: fileName),
+            ));
+          }
+        }
+
+        // إرسال البيانات
+        dataToSend = formData;
       }
 
       Response response = await dio.post(

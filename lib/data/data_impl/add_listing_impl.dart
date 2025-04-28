@@ -1,6 +1,8 @@
 import 'package:dartz/dartz.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:injectable/injectable.dart';
 import 'package:real_their/core/api/end_points.dart';
+import 'package:real_their/core/local_storage/shared_pref.dart';
 import 'package:real_their/data/data_contract/add_listing_contract.dart';
 import 'package:real_their/data/models/property_model.dart';
 
@@ -15,12 +17,14 @@ class AddListingImpl extends AddListingContract {
   AddListingImpl(this.apiManager);
 
   @override
-  Future<Either<PropertyModel, String>> addListing(Property pr) async {
+  Future<Either<PropertyModel, String>> addListing(Property pr,List<XFile>? images) async {
    try{
      var request = await apiManager.postRequest(
        endPoint: EndPoint.addPropertyEndPoint,
        body: pr.toMap(),
        isFormData: true,
+       images: pr.files,
+       token: PrefsHelper.getToken()
      );
 
      var property = PropertyModel.fromJson(request.data);

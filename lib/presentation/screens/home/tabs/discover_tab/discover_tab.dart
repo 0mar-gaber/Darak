@@ -1,60 +1,51 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:real_their/core/DI/di.dart';
 
 import '../../../../../core/reusable_components/recommend_for_you_widget.dart';
-import '../../../../../core/reusable_components/tabs_filter.dart';
 import '../../../../../core/reusable_components/text_field.dart';
 import '../../../search_screen/search_screen.dart';
+import '../../../../view_models/home_tab_view_model/home_tab_view_model.dart';
 
-class DiscoverTab extends StatefulWidget {
+class DiscoverTab extends StatelessWidget {
   const DiscoverTab({super.key});
 
   @override
-  State<DiscoverTab> createState() => _DiscoverTabState();
-}
-
-class _DiscoverTabState extends State<DiscoverTab> {
-  int selectedIndex = 0;
-
-  List<String> tabs = [
-    "All",
-    "Home",
-    "Trending",
-    "Popular",
-    "New",
-    "Favorites",
-  ];
-
-  @override
   Widget build(BuildContext context) {
-    return CustomScrollView(
-      slivers: [
-        SliverToBoxAdapter(child: SizedBox(height: 70.h)),
-        SliverPadding(
-          padding: REdgeInsets.symmetric(horizontal: 34.w),
-          sliver: SliverToBoxAdapter(
-            child: InkWell(
-              onTap: () => Navigator.pushNamed(context, SearchScreen.route),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: EditText(
-                      lapel: "Search for. .",
-                      obscureText: false,
-                      enabled: true,
-                      keyboardType: TextInputType.text,
-                      formKay: GlobalKey(),
-                      controller: SearchController(),
-                      iconButton: IconButton(
+    return BlocProvider(
+      create: (context) => getIt<GetPropertiesViewModel>()..getProperties(),
+      child: CustomScrollView(
+        slivers: [
+          // ------- Space from top --------
+          SliverToBoxAdapter(child: SizedBox(height: 70.h)),
+
+          // ------- Search Field -------
+          SliverPadding(
+            padding: REdgeInsets.symmetric(horizontal: 34.w),
+            sliver: SliverToBoxAdapter(
+              child: InkWell(
+                onTap: () => Navigator.pushNamed(context, SearchScreen.route),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: EditText(
+                        lapel: "Search for...",
+                        obscureText: false,
+                        enabled: true,
+                        keyboardType: TextInputType.text,
+                        formKay: GlobalKey(),
+                        controller: SearchController(),
+                        iconButton: IconButton(
                           onPressed: () {},
-                          icon: SvgPicture.asset("assets/svg/search_icon.svg")),
-                      decorate: false,
+                          icon: SvgPicture.asset("assets/svg/search_icon.svg"),
+                        ),
+                        decorate: false,
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: 20),
-                  InkWell(
-                    child: Container(
+                    SizedBox(width: 10),
+                    Container(
                       width: 60.w,
                       height: 65.h,
                       decoration: BoxDecoration(
@@ -63,49 +54,82 @@ class _DiscoverTabState extends State<DiscoverTab> {
                         borderRadius: BorderRadius.circular(16.r),
                       ),
                       child: Center(
-                          child: SvgPicture.asset("assets/svg/filter_icon.svg")),
-                    ),
-                  )
-                ],
+                        child: SvgPicture.asset("assets/svg/filter_icon.svg"),
+                      ),
+                    )
+                  ],
+                ),
               ),
             ),
           ),
-        ),
+          SliverToBoxAdapter(child: SizedBox(height: 25.h)),
 
-        // قائمة Tabs
-        SliverToBoxAdapter(
-          child: SizedBox(
-            height: 65.h,
-            child: ListView.separated(
-                scrollDirection: Axis.horizontal,
-                padding: REdgeInsets.only(top: 15, left: 34, right: 34),
-                itemBuilder: (context, index) => TabsFilter(
-                  text: tabs[index],
-                  index: index,
-                  selectedIndex: selectedIndex,
-                  onTap: (newIndex) {
-                    setState(() {
-                      selectedIndex = newIndex; // تحديث المؤشر عند الضغط
-                    });
-                  },
+          // ------- Discover Title -------
+          SliverPadding(
+            padding: REdgeInsets.symmetric(horizontal: 34.w),
+            sliver: SliverToBoxAdapter(
+              child: Text(
+                "Discover Properties",
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.primary,
+                  fontSize: 22.sp,
+                  fontWeight: FontWeight.w700,
                 ),
-                separatorBuilder: (context, index) => SizedBox(width: 10.w),
-                itemCount: tabs.length),
+              ),
+            ),
           ),
-        ),
-        SliverPadding(
-          padding: REdgeInsets.only(
-              top: 21.h, left: 34.w, right: 34.w, bottom: 20.h),
-          sliver: SliverGrid.builder(
-              itemBuilder: (context, index) => RecommendForYouWidget(id: index,),
-              itemCount: 6,
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                childAspectRatio: 0.8,
-                crossAxisSpacing: 18.w,
-              )),
-        )
-      ],
+          SliverToBoxAdapter(child: SizedBox(height: 21.h)),
+
+          // ------- Properties Grid -------
+          BlocBuilder<GetPropertiesViewModel, GetPropertiesState>(
+            builder: (context, state) {
+              if (state is LoadingGetPropertiesState) {
+                return SliverToBoxAdapter(
+                  child: SizedBox.shrink(child: Center(child: CircularProgressIndicator())),
+                );
+              } else if (state is SuccessGetPropertiesState) {
+                var properties = state.propertyResponseEntity.recommendedProperties;
+
+                return SliverPadding(
+                  padding: REdgeInsets.symmetric(horizontal: 34.w),
+                  sliver: SliverGrid.builder(
+                    itemCount: properties.length,
+                    itemBuilder: (context, index) {
+                      var property = properties[index];
+
+                      return RecommendForYouWidget(
+                        id: index,
+                        title: property.title,
+                        location: property.location,
+                        priceFormatted: property.priceFormatted,
+                        imageUrl: property.imageUrl,
+                        area: property.areaFormatted,
+                      );
+                    },
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      childAspectRatio: 0.9,
+                      crossAxisSpacing: 18.w,
+                      mainAxisSpacing: 50.h,
+                    ),
+                  ),
+                );
+              } else if (state is ErrorGetPropertiesState) {
+                return SliverToBoxAdapter(
+                  child: Center(
+                    child: Text(
+                      state.error,
+                      style: TextStyle(color: Colors.red, fontSize: 16.sp),
+                    ),
+                  ),
+                );
+              } else {
+                return SliverToBoxAdapter(child: SizedBox.shrink());
+              }
+            },
+          ),
+        ],
+      ),
     );
   }
 }

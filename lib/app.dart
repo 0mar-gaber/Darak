@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:onboarding/onboarding.dart';
 import 'package:provider/provider.dart';
 import 'package:real_their/presentation/screens/add_listing/add_listing_2_screen.dart';
 import 'package:real_their/presentation/screens/add_listing/add_listing_screen.dart';
@@ -54,7 +55,7 @@ class App extends StatelessWidget {
               ComparisonDetailsScreen.route:
                   (context) => ComparisonDetailsScreen(),
             },
-            initialRoute: OnBoarding.route,
+            initialRoute: HomeScreen.route,
             theme: AppTheme.theme,
           ),
     );

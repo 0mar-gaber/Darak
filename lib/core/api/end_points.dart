@@ -8,4 +8,5 @@ class EndPoint{
   static const updateUserDetailsEndPoint = "/api/User/profile";
   static const uploadPictureEndPoint = "/api/User/profile/upload-picture";
   static const addPropertyEndPoint = "/api/Property";
+  static const getPropertiesEndPoint = "/api/Property/GetHomePageData";
 }

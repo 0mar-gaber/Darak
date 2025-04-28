@@ -1,3 +1,7 @@
+import 'dart:io';
+
+import 'package:image_picker/image_picker.dart';
+
 class Property {
   String title;
   String description;
@@ -12,7 +16,7 @@ class Property {
   List<String>? amenities;
   int? floor;
   String type;
-  List<String>? files;
+  List<XFile>? files;
 
   Property({
     required this.title,
