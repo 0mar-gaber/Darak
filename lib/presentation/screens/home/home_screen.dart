@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
-import 'package:real_their/presentation/screens/comparison_details/comparison_details_screen.dart';
+import 'package:real_their/core/local_storage/shared_pref.dart';
+import 'package:real_their/presentation/view_models/favourite_view_model/favourite_view_model.dart';
 
 import '../../../core/reusable_components/add_apartment_sheet.dart';
-import '../../../core/reusable_components/filter_bottom_sheet_widget.dart';
 import '../../../core/shared_provider/home_screen_provider.dart';
 import 'tabs/discover_tab/discover_tab.dart';
 import 'tabs/home_tab/home_tab.dart';
@@ -29,6 +29,11 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     HomeScreenProvider homeScreenProvider =
         Provider.of<HomeScreenProvider>(context);
+
+
+    if(PrefsHelper.getUserId()!=null){
+      FavouriteViewModel.get(context).getFavourites(PrefsHelper.getUserId());
+    }
 
     return Scaffold(
 

@@ -1,9 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:real_their/domain/entitys/favourite_entity.dart';
+import 'package:real_their/domain/entitys/favourite_entity.dart';
+import 'package:real_their/domain/entitys/favourite_entity.dart';
 
+import '../../data/models/favourite_property_model.dart';
 
 class HomeScreenProvider extends ChangeNotifier {
   int tabIndex = 0;
+  List<FavouriteEntity> _favourites = [];
 
+  List<FavouriteEntity> get favourites => _favourites;
+
+  // تغيير التاب
   changeTab(int newTabIndex) {
     tabIndex = newTabIndex;
     notifyListeners();
@@ -12,6 +20,7 @@ class HomeScreenProvider extends ChangeNotifier {
   bool visibility = false;
   List<int> property = [];
 
+  // إضافة عقار للمقارنة
   addToCompare(int propertyId) {
     visibility = true;
 
@@ -20,17 +29,23 @@ class HomeScreenProvider extends ChangeNotifier {
         property.clear();
       }
       property.add(propertyId);
-    }else{
+    } else {
       property.clear();
       visibility = false;
     }
 
     notifyListeners();
   }
-  clearProperty(){
+
+  clearProperty() {
     property.clear();
     visibility = false;
     notifyListeners();
   }
-}
 
+  // إضافة قائمة الـ favourites
+  void setFavourites(List<FavouriteEntity> favs) {
+    _favourites = favs;
+    notifyListeners();
+  }
+}

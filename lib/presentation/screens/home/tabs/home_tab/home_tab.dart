@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -5,11 +6,11 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:real_their/core/DI/di.dart';
 
-import '../../../../../core/reusable_components/popular_nearest_you_widget.dart';
 import '../../../../../core/reusable_components/recommend_for_you_widget.dart';
 import '../../../../../core/reusable_components/text_field.dart';
 import '../../../../../core/shared_provider/home_screen_provider.dart';
 import '../../../../view_models/home_tab_view_model/home_tab_view_model.dart';
+import '../../../auth/sign_up_screen.dart';
 import '../../../search_screen/search_screen.dart';
 
 class HomeTab extends StatelessWidget {
@@ -17,8 +18,9 @@ class HomeTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    HomeScreenProvider homeScreenProvider =
-    Provider.of<HomeScreenProvider>(context);
+    HomeScreenProvider homeScreenProvider = Provider.of<HomeScreenProvider>(
+      context,
+    );
 
     return BlocProvider(
       create: (context) => getIt<GetPropertiesViewModel>()..getProperties(),
@@ -26,6 +28,10 @@ class HomeTab extends StatelessWidget {
         child: CustomScrollView(
           slivers: [
             // ------- Header Section --------
+            SliverToBoxAdapter(
+              child: SizedBox(height: 35.h,),
+            ),
+
             SliverPadding(
               padding: REdgeInsets.symmetric(horizontal: 34.w),
               sliver: SliverToBoxAdapter(
@@ -39,10 +45,12 @@ class HomeTab extends StatelessWidget {
                             height: 130.h,
                             child: Container(
                               decoration: BoxDecoration(
-                                  color: Theme.of(context).colorScheme.tertiary,
-                                  borderRadius: BorderRadius.only(
-                                      topLeft: Radius.circular(20.r),
-                                      bottomLeft: Radius.circular(20.r))),
+                                color: Theme.of(context).colorScheme.tertiary,
+                                borderRadius: BorderRadius.only(
+                                  topLeft: Radius.circular(20.r),
+                                  bottomLeft: Radius.circular(20.r),
+                                ),
+                              ),
                             ),
                           ),
                         ),
@@ -51,10 +59,12 @@ class HomeTab extends StatelessWidget {
                             height: 130.h,
                             child: Container(
                               decoration: BoxDecoration(
-                                  color: Color(0xffD8D8D8),
-                                  borderRadius: BorderRadius.only(
-                                      topRight: Radius.circular(20.r),
-                                      bottomRight: Radius.circular(20.r))),
+                                color: Color(0xffD8D8D8),
+                                borderRadius: BorderRadius.only(
+                                  topRight: Radius.circular(20.r),
+                                  bottomRight: Radius.circular(20.r),
+                                ),
+                              ),
                             ),
                           ),
                         ),
@@ -65,11 +75,12 @@ class HomeTab extends StatelessWidget {
                       child: Text(
                         "Discover\nFind your\nBest Living Places.",
                         style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 22.sp,
-                            fontWeight: FontWeight.w700),
+                          color: Colors.white,
+                          fontSize: 22.sp,
+                          fontWeight: FontWeight.w700,
+                        ),
                       ),
-                    )
+                    ),
                   ],
                 ),
               ),
@@ -93,8 +104,11 @@ class HomeTab extends StatelessWidget {
                           formKay: GlobalKey(),
                           controller: SearchController(),
                           iconButton: IconButton(
-                              onPressed: () {},
-                              icon: SvgPicture.asset("assets/svg/search_icon.svg")),
+                            onPressed: () {},
+                            icon: SvgPicture.asset(
+                              "assets/svg/search_icon.svg",
+                            ),
+                          ),
                           decorate: false,
                         ),
                       ),
@@ -108,8 +122,9 @@ class HomeTab extends StatelessWidget {
                           borderRadius: BorderRadius.circular(16.r),
                         ),
                         child: Center(
-                            child: SvgPicture.asset("assets/svg/filter_icon.svg")),
-                      )
+                          child: SvgPicture.asset("assets/svg/filter_icon.svg"),
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -127,9 +142,10 @@ class HomeTab extends StatelessWidget {
                     Text(
                       "Popular Nearest You",
                       style: TextStyle(
-                          color: Theme.of(context).colorScheme.primary,
-                          fontSize: 19.sp,
-                          fontWeight: FontWeight.w700),
+                        color: Theme.of(context).colorScheme.primary,
+                        fontSize: 19.sp,
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
                     InkWell(
                       onTap: () {
@@ -138,16 +154,69 @@ class HomeTab extends StatelessWidget {
                       child: Text(
                         "View All",
                         style: TextStyle(
-                            color: Theme.of(context).colorScheme.primary,
-                            fontSize: 14.sp,
-                            fontWeight: FontWeight.w700),
+                          color: Theme.of(context).colorScheme.primary,
+                          fontSize: 14.sp,
+                          fontWeight: FontWeight.w700,
+                        ),
                       ),
-                    )
+                    ),
                   ],
                 ),
               ),
             ),
             SliverToBoxAdapter(child: SizedBox(height: 21.h)),
+            SliverToBoxAdapter(
+              child: SizedBox(
+                height: 250.h,
+                child: Padding(
+                  padding: REdgeInsets.all(40),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "No user founded try singing up to view your nearest properties",
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.primary,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 20.sp,
+                        ),
+                      ),
+                      OutlinedButton(
+                        onPressed: () {
+                          Navigator.pushNamed(context, SignUpScreen.route);
+                        },
+                        style: OutlinedButton.styleFrom(
+                          fixedSize: Size(double.maxFinite, 58.h),
+                          backgroundColor:
+                              Theme.of(context).colorScheme.primary,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16.r),
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "sign up ",
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.background,
+                                fontSize: 15.sp,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                            Icon(
+                              CupertinoIcons.arrow_right,
+                              color: Theme.of(context).colorScheme.background,
+                              size: 25.sp,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
 
             // ------- Popular Properties List -------
             // BlocBuilder<GetPropertiesViewModel, GetPropertiesState>(
@@ -185,7 +254,6 @@ class HomeTab extends StatelessWidget {
             //     }
             //   },
             // ),
-
             SliverToBoxAdapter(child: SizedBox(height: 25.h)),
 
             // ------- Recommend for You Title -------
@@ -198,17 +266,19 @@ class HomeTab extends StatelessWidget {
                     Text(
                       "Recommend for You",
                       style: TextStyle(
-                          color: Theme.of(context).colorScheme.primary,
-                          fontSize: 19.sp,
-                          fontWeight: FontWeight.w700),
+                        color: Theme.of(context).colorScheme.primary,
+                        fontSize: 19.sp,
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
                     Text(
                       "View All",
                       style: TextStyle(
-                          color: Theme.of(context).colorScheme.primary,
-                          fontSize: 14.sp,
-                          fontWeight: FontWeight.w700),
-                    )
+                        color: Theme.of(context).colorScheme.primary,
+                        fontSize: 14.sp,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -219,34 +289,44 @@ class HomeTab extends StatelessWidget {
             BlocBuilder<GetPropertiesViewModel, GetPropertiesState>(
               builder: (context, state) {
                 if (state is SuccessGetPropertiesState) {
-                  print(state.propertyResponseEntity.recommendedProperties.length);
                   return SliverPadding(
                     padding: REdgeInsets.only(
-                        top: 0.h, left: 34.w, right: 34.w, bottom: 20.h),
+                      top: 0.h,
+                      left: 34.w,
+                      right: 34.w,
+                      bottom: 20.h,
+                    ),
                     sliver: SliverGrid.builder(
-                        itemCount: state.propertyResponseEntity.recommendedProperties.length,
-                        itemBuilder: (context, index) {
-                          var property = state.propertyResponseEntity.recommendedProperties[index];
+                      itemCount:
+                          state
+                              .propertyResponseEntity
+                              .recommendedProperties
+                              .length,
+                      itemBuilder: (context, index) {
+                        var property =
+                            state
+                                .propertyResponseEntity
+                                .recommendedProperties[index];
 
-                          return RecommendForYouWidget(
-                            id: index,
-                            title: property.title,
-                            location: property.location,
-                            priceFormatted: property.priceFormatted,
-                            imageUrl: property.imageUrl,
-                            area: property.areaFormatted,
-                          );
-                        },
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          childAspectRatio: 0.9,
-                          crossAxisSpacing: 18.w,
-                          mainAxisSpacing: 50.h,
-                        )),
+                        return RecommendForYouWidget(
+                          id: property.id,
+                          title: property.title,
+                          location: property.location,
+                          priceFormatted: property.priceFormatted,
+                          imageUrl: property.imageUrl,
+                          area: property.areaFormatted,
+                        );
+                      },
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        childAspectRatio: 0.9,
+                        crossAxisSpacing: 18.w,
+                        mainAxisSpacing: 50.h,
+                      ),
+                    ),
                   );
                 }
-                if (state is ErrorGetPropertiesState) {
-                }
+                if (state is ErrorGetPropertiesState) {}
                 return SliverToBoxAdapter(child: SizedBox.shrink());
               },
             ),

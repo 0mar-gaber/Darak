@@ -217,6 +217,7 @@ class _SignInScreenState extends State<SignInScreen> {
                               fontSize: 16.0.sp
                           );
                           PrefsHelper.setToken(state.userEntity!.token);
+                          PrefsHelper.setUserId(state.userEntity!.userId);
                           Navigator.pushNamedAndRemoveUntil(context, HomeScreen.route, (route) => false);
 
                         }

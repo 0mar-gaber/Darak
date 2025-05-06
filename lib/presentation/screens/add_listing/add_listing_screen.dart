@@ -724,6 +724,10 @@ class _AddListingScreenState extends State<AddListingScreen> {
                             if(state is AddListingError){
                               print(state.error);
                             }
+                            if(state is AddListingSuccess){
+
+                              Navigator.pop(context);
+                            }
                           },
                       ),
 

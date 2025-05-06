@@ -1,10 +1,13 @@
-
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:real_their/domain/entitys/favourite_entity.dart';
+import 'package:real_their/presentation/view_models/favourite_view_model/favourite_view_model.dart';
 
+import '../../../../../core/local_storage/shared_pref.dart';
 import '../../../../../core/reusable_components/recommend_for_you_widget.dart';
-import '../../../../../core/reusable_components/tabs_filter.dart';
+import '../../../auth/sign_up_screen.dart';
 
 class WishlistTab extends StatefulWidget {
   const WishlistTab({super.key});
@@ -14,72 +17,130 @@ class WishlistTab extends StatefulWidget {
 }
 
 class _WishlistTabState extends State<WishlistTab> {
-  int selectedIndex = 0;
-
-  List<String> tabs = [
-    "All",
-    "Home",
-    "Trending",
-    "Popular",
-    "New",
-    "Favorites",
-  ];
-
   @override
   Widget build(BuildContext context) {
+    if (PrefsHelper.getToken() == "omar") {
+      return Padding(
+        padding: REdgeInsets.all(40),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            Spacer(),
+            Spacer(),
+
+            SvgPicture.asset("assets/svg/user_not_found.svg",width: 140.w,height: 140.h,color: Theme.of(context).colorScheme.primary,),
+            Spacer(),
+
+            Text("No user founded try singing up to view",
+              style: TextStyle(
+                  color: Theme.of(context).colorScheme.primary,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 20.sp
+              ),),
+            Spacer(),
+
+            OutlinedButton(
+              onPressed: () {
+                Navigator.pushNamed(context, SignUpScreen.route);
+              },
+              style: OutlinedButton.styleFrom(
+                fixedSize: Size(double.maxFinite, 68.h),
+                backgroundColor: Theme
+                    .of(context)
+                    .colorScheme
+                    .primary,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16.r),
+                ),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    "sign up to view your profile",
+                    style: TextStyle(
+                      color: Theme
+                          .of(context)
+                          .colorScheme
+                          .background,
+                      fontSize: 20.sp,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  Icon(
+                    CupertinoIcons.arrow_right,
+                    color: Theme
+                        .of(context)
+                        .colorScheme
+                        .background,
+                    size: 25.sp,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    List<FavouriteEntity> faves = FavouriteViewModel.get(context).favourites;
+
     return CustomScrollView(
       slivers: [
-        SliverToBoxAdapter(child: SizedBox(height: 50.h,)),
+        SliverToBoxAdapter(child: SizedBox(height: 70.h)),
         SliverToBoxAdapter(
           child: Padding(
             padding: REdgeInsets.symmetric(horizontal: 35),
-            child: Text("Favorites",style: TextStyle(color: Theme.of(context).colorScheme.primary,fontSize: 22.sp,fontWeight: FontWeight.w700),),
+            child: Text(
+              "Favorites",
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.primary,
+                fontSize: 22.sp,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
           ),
         ),
-        SliverToBoxAdapter(child: SizedBox(height: 25.h,)),
-        SliverToBoxAdapter(
-          child: SizedBox(
-            height: 65.h,
-            child: ListView.separated(
-                scrollDirection: Axis.horizontal,
-                padding: REdgeInsets.only(top: 15, left: 34, right: 34),
-                itemBuilder: (context, index) => TabsFilter(
-                  text: tabs[index],
-                  index: index,
-                  selectedIndex: selectedIndex,
-                  onTap: (newIndex) {
-                    setState(() {
-                      selectedIndex = newIndex;
-                    });
-                  },
-                ),
-                separatorBuilder: (context, index) => SizedBox(width: 10.w),
-                itemCount: tabs.length),
-          ),
-        ),
-        SliverToBoxAdapter(child: SizedBox(height: 25.h,)),
+        SliverToBoxAdapter(child: SizedBox(height: 25.h)),
+        SliverToBoxAdapter(child: SizedBox(height: 25.h)),
         SliverToBoxAdapter(
           child: Padding(
             padding: REdgeInsets.symmetric(horizontal: 35),
-            child: Text("25 Favorites",style: TextStyle(color: Theme.of(context).colorScheme.primary,fontSize: 16.sp,fontWeight: FontWeight.w700),),
+            child: Text(
+              "${faves.length} Favorites",
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.primary,
+                fontSize: 16.sp,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
           ),
         ),
         SliverPadding(
           padding: REdgeInsets.only(
-              top: 21.h, left: 34.w, right: 34.w, bottom: 20.h),
+            top: 21.h,
+            left: 34.w,
+            right: 34.w,
+            bottom: 20.h,
+          ),
           sliver: SliverGrid.builder(
-              itemBuilder: (context, index) => RecommendForYouWidget(id: index, imageUrl: '', title: '', location: '', priceFormatted: '',area: '',),
-              itemCount: 10,
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                childAspectRatio: 0.8,
-                crossAxisSpacing: 18.w,
-              )),
-        )
-
-
-
-
+            itemBuilder:
+                (context, index) => RecommendForYouWidget(
+                  id: faves[index].propertyId,
+                  imageUrl: faves[index].mainImageUrl,
+                  title: faves[index].title,
+                  location: faves[index].address,
+                  priceFormatted: faves[index].formattedPrice,
+                  area: faves[index].area.toString(),
+                ),
+            itemCount: faves.length,
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              childAspectRatio: 0.8,
+              crossAxisSpacing: 18.w,
+            ),
+          ),
+        ),
       ],
     );
   }

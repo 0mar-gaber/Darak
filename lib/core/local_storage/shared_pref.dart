@@ -22,4 +22,12 @@ class PrefsHelper{
   static getPhoneNumber(){
     return sharedPreferences.getString("phone number");
   }
+
+
+  static setUserId(String userId){
+    sharedPreferences.setString("user id", userId);
+  }
+  static getUserId(){
+    return sharedPreferences.getString("user id");
+  }
 }

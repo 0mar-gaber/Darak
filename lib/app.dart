@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:onboarding/onboarding.dart';
 import 'package:provider/provider.dart';
+import 'package:real_their/core/local_storage/shared_pref.dart';
 import 'package:real_their/presentation/screens/add_listing/add_listing_2_screen.dart';
 import 'package:real_their/presentation/screens/add_listing/add_listing_screen.dart';
 import 'package:real_their/presentation/screens/comparison_details/comparison_details_screen.dart';
 import 'package:real_their/presentation/view_models/profile_view_model/profile_view_model.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'config/theme.dart';
 import 'core/shared_provider/home_screen_provider.dart';
@@ -55,7 +57,9 @@ class App extends StatelessWidget {
               ComparisonDetailsScreen.route:
                   (context) => ComparisonDetailsScreen(),
             },
-            initialRoute: HomeScreen.route,
+            initialRoute: PrefsHelper.getToken()=="omar"
+                ? OnBoarding.route
+                : HomeScreen.route ,
             theme: AppTheme.theme,
           ),
     );

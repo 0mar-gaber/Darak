@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:introduction_screen/introduction_screen.dart';
+import 'package:real_their/presentation/screens/home/home_screen.dart';
 
 import '../auth/sign_in_screen.dart';
 
@@ -174,7 +175,7 @@ class _OnBoardingState extends State<OnBoarding> {
                           ),
                         ),
                         onTap: () {
-                          Navigator.pushNamed(context, SignInScreen.route);
+                          Navigator.pushNamed(context, HomeScreen.route);
                         },
                       ),
               ],

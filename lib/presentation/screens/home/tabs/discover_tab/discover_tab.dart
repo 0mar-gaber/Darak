@@ -98,7 +98,7 @@ class DiscoverTab extends StatelessWidget {
                       var property = properties[index];
 
                       return RecommendForYouWidget(
-                        id: index,
+                        id: property.id,
                         title: property.title,
                         location: property.location,
                         priceFormatted: property.priceFormatted,

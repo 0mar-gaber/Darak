@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:real_their/presentation/screens/auth/sign_in_screen.dart';
 
 import '../home/home_screen.dart';
 
@@ -49,7 +50,7 @@ class VerificationStatusScreen extends StatelessWidget {
                   SizedBox(
                     height: 17.h,
                   ),
-                  Center(child: Text("Your Account is Ready to Use. You will be Redirected to the Home Page in a Few Seconds.",style: TextStyle(color: Colors.black,fontSize: 15.sp,fontWeight:FontWeight.w600 ),textAlign: TextAlign.center,)),
+                  Center(child: Text("Your Account is Ready to Use. Log in with your email and password now",style: TextStyle(color: Colors.black,fontSize: 15.sp,fontWeight:FontWeight.w600 ),textAlign: TextAlign.center,)),
                   SizedBox(
                     height: 50.h,
                   ),
@@ -57,7 +58,7 @@ class VerificationStatusScreen extends StatelessWidget {
                     padding: REdgeInsets.only(left: 20,right: 20),
                     child: OutlinedButton(
                       onPressed: () {
-                        Navigator.pushNamed(context, HomeScreen.route);
+                        Navigator.pushNamed(context, SignInScreen.route);
                       },
                       style: OutlinedButton.styleFrom(
                         fixedSize: Size(double.maxFinite, 68.h),
@@ -70,7 +71,7 @@ class VerificationStatusScreen extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            "Home Page",
+                            "Log in Screen",
                             style: TextStyle(
                               color: Theme
                                   .of(context)

@@ -234,19 +234,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         },
                         listener: (context, state) {
                           if (state is SignupViewModelErrorState) {
+
                             DialogUtil.showMessageDialog(context: context, message: "Email is already registered. ");
 
                           }
                           if (state is SignupViewModelSuccessState) {
-                            Fluttertoast.showToast(
-                                msg: "log in done successfully",
-                                toastLength: Toast.LENGTH_SHORT,
-                                gravity: ToastGravity.BOTTOM,
-                                timeInSecForIosWeb: 1,
-                                backgroundColor: Colors.green,
-                                textColor: Colors.white,
-                                fontSize: 16.0.sp
-                            );
+
                             Navigator.pushNamed(context, OtpScreen.route,arguments:  {
                             'phone number':phoneNumberController.text.toString() ,
                             'from': "sign up",

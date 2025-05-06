@@ -156,4 +156,25 @@ class ApiManager {
     }
   }
 
+  Future<Response> deleteRequest({
+    required String endPoint,
+    Map<String, dynamic>? queryParameters,
+    String? token, // ✅ دعم التوكن
+  }) async {
+    try {
+      Response response = await dio.delete(
+        endPoint,
+        queryParameters: queryParameters,
+        options: Options(
+          headers: token != null ? {'Authorization': 'Bearer $token'} : null,
+        ),
+      );
+
+      return response;
+    } catch (error) {
+      throw Exception('Delete request error: $error');
+    }
+  }
+
+
 }

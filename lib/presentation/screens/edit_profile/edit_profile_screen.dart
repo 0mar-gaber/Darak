@@ -118,7 +118,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       radius: 70.r,
                       backgroundColor: Colors.black,
                       backgroundImage: _image == null
-                          ? NetworkImage("https://10.0.2.2:7030${userDetails.profilePictureUrl}") as ImageProvider
+                          ? NetworkImage("${Constant.imageBaseUrl}${userDetails.profilePictureUrl}") as ImageProvider
                           : FileImage(File(_image!.path)),
                     ),
                     SizedBox(height: 20.h),
