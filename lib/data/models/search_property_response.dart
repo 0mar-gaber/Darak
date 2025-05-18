@@ -1,22 +1,24 @@
-class PropertyEntity {
+import 'dart:convert';
+
+class SearchPropertyResponse {
   final String id;
   final String title;
   final String description;
   final String ownerName;
   final String contactInfo;
   final bool isOwner;
-  final num price;          // بدل int -> num
+  final int price;
   final String type;
   final String addressLine1;
   final String addressLine2;
   final String city;
   final String governorate;
   final String postalCode;
-  final num bedrooms;       // بدل int -> num
-  final num bathrooms;      // بدل int -> num
-  final num floor;          // بدل int -> num
+  final int bedrooms;
+  final int bathrooms;
+  final int floor;
   final List<String> images;
-  final double area;
+  final int area;
   final String furnishStatus;
   final String mainImageUrl;
   final List<String> amenities;
@@ -25,7 +27,7 @@ class PropertyEntity {
   final String priceFormatted;
   final String locationShort;
 
-  PropertyEntity({
+  SearchPropertyResponse({
     required this.id,
     required this.title,
     required this.description,
@@ -53,34 +55,41 @@ class PropertyEntity {
     required this.locationShort,
   });
 
-  factory PropertyEntity.fromJson(Map<String, dynamic> json) {
-    return PropertyEntity(
-      id: json['id'] ?? '',
-      title: json['title'] ?? '',
-      description: json['description'] ?? '',
-      ownerName: json['ownerName'] ?? '',
-      contactInfo: json['contactInfo'] ?? '',
-      isOwner: json['isOwner'] ?? false,
-      price: (json['price'] as num?) ?? 0,
-      type: json['type'] ?? '',
-      addressLine1: json['addressLine1'] ?? '',
-      addressLine2: json['addressLine2'] ?? '',
-      city: json['city'] ?? '',
-      governorate: json['governorate'] ?? '',
-      postalCode: json['postalCode'] ?? '',
-      bedrooms: (json['bedrooms'] as num?) ?? 0,
-      bathrooms: (json['bathrooms'] as num?) ?? 0,
-      floor: (json['floor'] as num?) ?? 0,
-      images: List<String>.from(json['images'] ?? []),
-      area: (json['area'] ?? 0).toDouble(),
-      furnishStatus: json['furnishStatus'] ?? '',
-      mainImageUrl: json['mainImageUrl'] ?? '',
-      amenities: List<String>.from(json['amenities'] ?? []),
-      createdAt: DateTime.tryParse(json['createdAt'] ?? '') ?? DateTime.now(),
-      shortDescription: json['shortDescription'] ?? '',
-      priceFormatted: json['priceFormatted'] ?? '',
-      locationShort: json['locationShort'] ?? '',
+  factory SearchPropertyResponse.fromJson(Map<String, dynamic> json) {
+    return SearchPropertyResponse(
+      id: json['id'],
+      title: json['title'],
+      description: json['description'],
+      ownerName: json['ownerName'],
+      contactInfo: json['contactInfo'],
+      isOwner: json['isOwner'],
+      price: (json['price'] as num).toInt(),
+      type: json['type'],
+      addressLine1: json['addressLine1'],
+      addressLine2: json['addressLine2'],
+      city: json['city'],
+      governorate: json['governorate'],
+      postalCode: json['postalCode'].toString(),
+      bedrooms: (json['bedrooms'] as num).toInt(),
+      bathrooms: (json['bathrooms'] as num).toInt(),
+      floor: (json['floor'] as num).toInt(),
+      images: List<String>.from(json['images']),
+      area: (json['area'] as num).toInt(),
+      furnishStatus: json['furnishStatus'],
+      mainImageUrl: json['mainImageUrl'],
+      amenities: List<String>.from(json['amenities']),
+      createdAt: DateTime.parse(json['createdAt']),
+      shortDescription: json['shortDescription'],
+      priceFormatted: json['priceFormatted'],
+      locationShort: json['locationShort'],
     );
+  }
+
+  // دالة لتحويل قائمة من JSON إلى قائمة من الكائنات
+  static List<SearchPropertyResponse> fromJsonList(List<dynamic> jsonList) {
+    return jsonList
+        .map((json) => SearchPropertyResponse.fromJson(json))
+        .toList();
   }
 
   Map<String, dynamic> toJson() {
@@ -112,4 +121,7 @@ class PropertyEntity {
       'locationShort': locationShort,
     };
   }
+
+  @override
+  String toString() => jsonEncode(toJson());
 }

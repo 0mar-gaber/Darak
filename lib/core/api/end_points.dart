@@ -9,7 +9,9 @@ class EndPoint{
   static const uploadPictureEndPoint = "/api/User/profile/upload-picture";
   static const addPropertyEndPoint = "/api/Property";
   static const getPropertiesEndPoint = "/api/Property/GetHomePageData";
+  static const getNearMePropertiesEndPoint = "/api/Property/near-me";
   static const addFavouriteEndPoint = "/api/Favorites";
   static const getFavouritesEndPoint = "/api/Favorites";
   static const removeFavouriteEndPoint = "/api/Favorites";
+  static const getAllSearchProperty = "/api/Property/GetAllProperties";
 }

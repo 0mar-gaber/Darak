@@ -131,7 +131,7 @@ class _WishlistTabState extends State<WishlistTab> {
                   title: faves[index].title,
                   location: faves[index].address,
                   priceFormatted: faves[index].formattedPrice,
-                  area: faves[index].area.toString(),
+                  area: faves[index].area.toInt().toString(),
                 ),
             itemCount: faves.length,
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(

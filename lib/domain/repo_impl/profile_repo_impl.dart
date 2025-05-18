@@ -20,12 +20,11 @@ class ProfileRepoImpl extends ProfileRepoContract {
     return result.fold((response) {
       var userDetails = UserDetailsEntity(
         id: response.id,
-        userName: response.userName,
+        userName: response.bio,
         email: response.email,
-        phoneNumber: response.phoneNumber,
-        gender: response.gender,
+        governorate: response.governorate,
+        city: response.city,
         profilePictureUrl: response.profilePictureUrl,
-        bio: response.bio,
       );
 
       return Left(userDetails);

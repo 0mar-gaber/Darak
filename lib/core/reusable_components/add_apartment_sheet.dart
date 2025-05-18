@@ -10,8 +10,7 @@ class AddApartmentSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: double.infinity,
-      height: MediaQuery.of(context).size.height - 65.h,
+      height:400. h ,
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.vertical(top: Radius.circular(16.r)),

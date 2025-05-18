@@ -4,22 +4,22 @@ import 'package:injectable/injectable.dart';
 import 'package:real_their/domain/entitys/favourite_entity.dart';
 import 'package:real_their/domain/use_cases/favourite_use_case.dart';
 
+@injectable
 class FavouriteViewModel extends Cubit<FavouriteState> {
   final FavouriteUseCase useCase;
-  List<FavouriteEntity> favourites = []; // إضافة متغير لحفظ الـ favourites
+  List<FavouriteEntity> favourites = [];
 
   @factoryMethod
   FavouriteViewModel(this.useCase) : super(FavouriteInitial());
 
-  static FavouriteViewModel get(BuildContext context) =>
-      BlocProvider.of(context);
+  static FavouriteViewModel get(BuildContext context) => BlocProvider.of(context);
 
   Future<void> addToFavourite(String userId, String propertyId) async {
-    emit(FavouriteLoading());
+    emit(FavouriteLoading(loadingPropertyId: propertyId));
     final result = await useCase.add(userId, propertyId);
     result.fold(
           (_) async {
-        await getFavourites(userId); // إعادة تحميل الـ favourites بعد الإضافة
+        await getFavourites(userId);
         emit(FavouriteAddSuccess());
       },
           (error) => emit(FavouriteError(error)),
@@ -31,7 +31,7 @@ class FavouriteViewModel extends Cubit<FavouriteState> {
     final result = await useCase.get(userId);
     result.fold(
           (favouritesList) {
-        favourites = favouritesList; // تخزين الـ favourites في المتغير
+        favourites = favouritesList;
         emit(FavouriteGetSuccess(favouritesList));
       },
           (error) => emit(FavouriteError(error)),
@@ -39,11 +39,11 @@ class FavouriteViewModel extends Cubit<FavouriteState> {
   }
 
   Future<void> removeFromFavourite(String userId, String propertyId) async {
-    emit(FavouriteLoading());
+    emit(FavouriteLoading(loadingPropertyId: propertyId));
     final result = await useCase.remove(userId, propertyId);
     result.fold(
           (_) async {
-        await getFavourites(userId); // إعادة تحميل الـ favourites بعد الإزالة
+        await getFavourites(userId);
         emit(FavouriteRemoveSuccess());
       },
           (error) => emit(FavouriteError(error)),
@@ -51,12 +51,16 @@ class FavouriteViewModel extends Cubit<FavouriteState> {
   }
 }
 
-
+// تحديث حالة FavouriteLoading لتعبر عن loading لعنصر معين أو عام
 abstract class FavouriteState {}
 
 class FavouriteInitial extends FavouriteState {}
 
-class FavouriteLoading extends FavouriteState {}
+class FavouriteLoading extends FavouriteState {
+  final String? loadingPropertyId; // العنصر الجاري تحميله، أو null للتحميل العام
+
+  FavouriteLoading({this.loadingPropertyId});
+}
 
 class FavouriteAddSuccess extends FavouriteState {}
 

@@ -4,6 +4,7 @@ import 'package:real_their/domain/entitys/favourite_entity.dart';
 import 'package:real_their/domain/entitys/favourite_entity.dart';
 
 import '../../data/models/favourite_property_model.dart';
+import '../reusable_components/filter_model.dart';
 
 class HomeScreenProvider extends ChangeNotifier {
   int tabIndex = 0;
@@ -48,4 +49,32 @@ class HomeScreenProvider extends ChangeNotifier {
     _favourites = favs;
     notifyListeners();
   }
+
+
+  FilterModel _filter = FilterModel(
+    minPrice: null,
+    maxPrice: null,
+    minArea: null,
+    maxArea: null,
+    rooms: null,
+    bathrooms: null,
+    propertyType: null,
+    availability: null,
+    furnished: null,
+  );
+
+  FilterModel get filter => _filter;
+
+  void updateFilter(FilterModel newFilter) {
+    _filter = newFilter;
+    notifyListeners();
+  }
+
+  void resetFilter() {
+    _filter.reset();
+    notifyListeners();
+  }
+
+
+
 }

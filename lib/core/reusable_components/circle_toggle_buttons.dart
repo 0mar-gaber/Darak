@@ -2,16 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class CircleToggleButtons extends StatefulWidget {
-  const CircleToggleButtons({super.key,required this.numberOfIndex});
+  const CircleToggleButtons({
+    super.key,
+    required this.numberOfIndex,
+    required this.onSelected,
+  });
 
-  final  int numberOfIndex ;
+  final int numberOfIndex;
+  final ValueChanged<int> onSelected; // Callback to return the selected index
 
   @override
   State<CircleToggleButtons> createState() => _CircleToggleButtonsState();
 }
 
 class _CircleToggleButtonsState extends State<CircleToggleButtons> {
-  int selectedIndex = 0; // Tracks the selected button index
+  int selectedIndex = -1; // Tracks the selected button index
 
   @override
   Widget build(BuildContext context) {
@@ -23,6 +28,8 @@ class _CircleToggleButtonsState extends State<CircleToggleButtons> {
             setState(() {
               selectedIndex = index;
             });
+            // Pass the actual displayed value (index + 1) to the callback
+            widget.onSelected(index + 1);
           },
           child: Container(
             margin: REdgeInsets.symmetric(horizontal: 8),
@@ -32,7 +39,7 @@ class _CircleToggleButtonsState extends State<CircleToggleButtons> {
               shape: BoxShape.circle,
               color: isSelected ? Theme.of(context).colorScheme.primary : Colors.transparent,
               border: Border.all(
-                color:  Theme.of(context).colorScheme.primary ,
+                color: Theme.of(context).colorScheme.primary,
                 width: 1.sp,
               ),
             ),

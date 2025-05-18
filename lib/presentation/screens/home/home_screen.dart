@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -7,6 +8,7 @@ import 'package:real_their/presentation/view_models/favourite_view_model/favouri
 
 import '../../../core/reusable_components/add_apartment_sheet.dart';
 import '../../../core/shared_provider/home_screen_provider.dart';
+import '../auth/sign_up_screen.dart';
 import 'tabs/discover_tab/discover_tab.dart';
 import 'tabs/home_tab/home_tab.dart';
 import 'tabs/profile_tab/Profile_tab.dart';
@@ -20,28 +22,25 @@ class HomeScreen extends StatelessWidget {
     const DiscoverTab(),
     const WishlistTab(),
     const WishlistTab(),
-    const ProfileTab()
+    const ProfileTab(),
   ];
 
   static const String route = "HomeScreen";
 
   @override
   Widget build(BuildContext context) {
-    HomeScreenProvider homeScreenProvider =
-        Provider.of<HomeScreenProvider>(context);
+    HomeScreenProvider homeScreenProvider = Provider.of<HomeScreenProvider>(
+      context,
+    );
 
-
-    if(PrefsHelper.getUserId()!=null){
+    if (PrefsHelper.getUserId() != null) {
       FavouriteViewModel.get(context).getFavourites(PrefsHelper.getUserId());
     }
 
     return Scaffold(
-
       body: Stack(
         children: [
-          Positioned.fill(
-            child: tabsList[homeScreenProvider.tabIndex],
-          ),
+          Positioned.fill(child: tabsList[homeScreenProvider.tabIndex]),
 
           if (homeScreenProvider.visibility)
             Positioned(
@@ -65,15 +64,15 @@ class HomeScreen extends StatelessWidget {
                         offset: Offset(0, 3), // Shadow position
                       ),
                     ],
-
                   ),
                   child: Center(
                     child: Text(
                       "Compare ( ${homeScreenProvider.property.length} of 2 selected )",
                       style: TextStyle(
-                          color: Theme.of(context).colorScheme.primary,
-                          fontSize: 18.sp,
-                          fontWeight: FontWeight.w700),
+                        color: Theme.of(context).colorScheme.primary,
+                        fontSize: 18.sp,
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
                   ),
                 ),
@@ -83,61 +82,179 @@ class HomeScreen extends StatelessWidget {
       ),
 
       bottomNavigationBar: BottomNavigationBar(
-          onTap: (value) {
-            if(value==2){
-              return;
-            }
-            homeScreenProvider.changeTab(value);
-          },
-          currentIndex: homeScreenProvider.tabIndex,
-          type: BottomNavigationBarType.fixed,
-          showUnselectedLabels: true,
-          showSelectedLabels: true,
-          selectedFontSize: 12.sp,
-          unselectedFontSize: 12.sp,
-          selectedLabelStyle: TextStyle(fontWeight: FontWeight.w500),
-          unselectedLabelStyle: TextStyle(fontWeight: FontWeight.w500),
-          items: [
-            bottomNavigationBarItem(svgUrl: "assets/svg/home.svg", context: context, index: 0, label: "Home"),
-            bottomNavigationBarItem(svgUrl: "assets/svg/explore.svg", context: context, index: 1, label: "Explore"),
-            bottomNavigationBarItem(svgUrl: "assets/svg/chevron-up-svgrepo-com.svg", context: context, index: 2, label: "Add"),
-            bottomNavigationBarItem(svgUrl: "assets/svg/ads.svg", context: context, index: 3, label: "My Ads"),
-            bottomNavigationBarItem(svgUrl: "assets/svg/profile.svg", context: context, index: 4, label: "Profile"),
-          ]
+        onTap: (value) {
+          if (value == 2) {
+            return;
+          }
+          homeScreenProvider.changeTab(value);
+        },
+        currentIndex: homeScreenProvider.tabIndex,
+        type: BottomNavigationBarType.fixed,
+        showUnselectedLabels: true,
+        showSelectedLabels: true,
+        selectedFontSize: 12.sp,
+        unselectedFontSize: 12.sp,
+        selectedLabelStyle: TextStyle(fontWeight: FontWeight.w500),
+        unselectedLabelStyle: TextStyle(fontWeight: FontWeight.w500),
+        items: [
+          bottomNavigationBarItem(
+            svgUrl: "assets/svg/home.svg",
+            context: context,
+            index: 0,
+            label: "Home",
+          ),
+          bottomNavigationBarItem(
+            svgUrl: "assets/svg/explore.svg",
+            context: context,
+            index: 1,
+            label: "Explore",
+          ),
+          bottomNavigationBarItem(
+            svgUrl: "assets/svg/chevron-up-svgrepo-com.svg",
+            context: context,
+            index: 2,
+            label: "Add",
+          ),
+          bottomNavigationBarItem(
+            svgUrl: "assets/svg/ads.svg",
+            context: context,
+            index: 3,
+            label: "My Ads",
+          ),
+          bottomNavigationBarItem(
+            svgUrl: "assets/svg/profile.svg",
+            context: context,
+            index: 4,
+            label: "Profile",
+          ),
+        ],
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: FloatingActionButton(
-          onPressed: () => showModalBottomSheet(
+        onPressed: () {
+          showModalBottomSheet(
             context: context,
             isScrollControlled: true,
-            builder: (context) => AddApartmentSheet(),
-          ),
+            builder: (context) => PrefsHelper.getToken() != "omar"
+                ? AddApartmentSheet()
+                : _buildSignUpWidget(context)
+            ,
+          );
+        },
         shape: CircleBorder(),
         backgroundColor: Theme.of(context).colorScheme.primary,
-        child: Icon(Icons.add,color: Colors.white,),
+        child: Icon(Icons.add, color: Colors.white),
       ),
     );
   }
 
-  bottomNavigationBarItem(
-      {
-        required String svgUrl,
-        required BuildContext context,
-        required int index,
-        required String label
-     }) {
-    HomeScreenProvider homeScreenProvider =
-        Provider.of<HomeScreenProvider>(context, listen: false);
+  bottomNavigationBarItem({
+    required String svgUrl,
+    required BuildContext context,
+    required int index,
+    required String label,
+  }) {
+    HomeScreenProvider homeScreenProvider = Provider.of<HomeScreenProvider>(
+      context,
+      listen: false,
+    );
 
     BottomNavigationBarItem bottomNavigationBarItem = BottomNavigationBarItem(
-        icon: SvgPicture.asset(
-          svgUrl ,
-          height: 25.h,
-          colorFilter: homeScreenProvider.tabIndex == index
-            ? ColorFilter.mode(Theme.of(context).colorScheme.primary, BlendMode.srcIn) : null,
-        ),
-        label: label,
+      icon: SvgPicture.asset(
+        svgUrl,
+        height: 25.h,
+        colorFilter:
+            homeScreenProvider.tabIndex == index
+                ? ColorFilter.mode(
+                  Theme.of(context).colorScheme.primary,
+                  BlendMode.srcIn,
+                )
+                : null,
+      ),
+      label: label,
     );
     return bottomNavigationBarItem;
+  }
+  
+  Widget _buildSignUpWidget(BuildContext context){
+    return SizedBox(
+      height: 400.h,
+      child: Padding(
+        padding: REdgeInsets.all(16),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            Center(
+              child: Container(
+                width: 40.w,
+                height: 5.h,
+                margin: EdgeInsets.only(bottom: 20.h),
+                decoration: BoxDecoration(
+                  color: Colors.grey[300],
+                  borderRadius: BorderRadius.circular(12.r),
+                ),
+              ),
+            ),
+
+            Spacer(),
+            Spacer(),
+
+            SvgPicture.asset("assets/svg/user_not_found.svg",width: 40.w,height: 40.h,color: Theme.of(context).colorScheme.primary,),
+            Spacer(),
+
+            Text("No user founded try singing up to view",
+              style: TextStyle(
+                  color: Theme.of(context).colorScheme.primary,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 15.sp
+              ),),
+            Spacer(),
+
+            Padding(
+              padding: REdgeInsets.all(40.0),
+              child: OutlinedButton(
+                onPressed: () {
+                  Navigator.pushNamed(context, SignUpScreen.route);
+                },
+                style: OutlinedButton.styleFrom(
+                  fixedSize: Size(double.maxFinite, 68.h),
+                  backgroundColor: Theme
+                      .of(context)
+                      .colorScheme
+                      .primary,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16.r),
+                  ),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "sign up to view your profile",
+                      style: TextStyle(
+                        color: Theme
+                            .of(context)
+                            .colorScheme
+                            .background,
+                        fontSize: 15.sp,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    Icon(
+                      CupertinoIcons.arrow_right,
+                      color: Theme
+                          .of(context)
+                          .colorScheme
+                          .background,
+                      size: 25.sp,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    ) ;
   }
 }

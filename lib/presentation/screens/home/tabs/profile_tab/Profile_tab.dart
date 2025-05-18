@@ -17,6 +17,7 @@ class ProfileTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print(PrefsHelper.getToken());
     if (PrefsHelper.getToken() == "omar") {
       return Padding(
         padding: REdgeInsets.all(40),
@@ -124,7 +125,7 @@ class ProfileTab extends StatelessWidget {
                   ),
                   ProfileWidget(
                       email: state.userDetailsEntity.email,
-                      name: state.userDetailsEntity.bio,
+                      name: state.userDetailsEntity.userName,
                       image: "${Constant.imageBaseUrl}${state.userDetailsEntity
                           .profilePictureUrl}"
                   ),

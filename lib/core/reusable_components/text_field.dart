@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 typedef OnTap = void Function()?;
+typedef OnChanged = void Function(String)?;
 typedef Validate = String? Function(String?)?;
 
 class EditText extends StatelessWidget {
@@ -9,6 +10,7 @@ class EditText extends StatelessWidget {
   final bool obscureText ;
   final bool decorate;
   final OnTap? onTap;
+  final OnChanged? onChanged;
   final IconButton? iconButton;
   final IconButton? prefixIconButton;
   final TextInputType ? keyboardType;
@@ -32,6 +34,7 @@ class EditText extends StatelessWidget {
     this.prefixIconButton,
     this.controller,
     this.maxLength,
+    this.onChanged,
   });
 
   @override
@@ -58,6 +61,7 @@ class EditText extends StatelessWidget {
       child: TextFormField(
         controller: controller,
         validator: validate,
+        onChanged: onChanged,
         keyboardType: keyboardType,
         obscureText: obscureText,
         maxLength: maxLength,

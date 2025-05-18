@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
+import 'package:real_their/domain/entitys/property_entity.dart';
 import 'package:real_their/domain/entitys/property_response_entity.dart';
 import 'package:real_their/domain/use_cases/get_properties_use_case.dart';
 
@@ -15,11 +16,21 @@ class GetPropertiesViewModel extends Cubit<GetPropertiesState> {
 
   getProperties() async {
     emit(LoadingGetPropertiesState());
-    var request = await useCase.call();
+    var request = await useCase.callGetProperties();
 
     request.fold(
           (response) => emit(SuccessGetPropertiesState(response)),
           (error) => emit(ErrorGetPropertiesState(error)),
+    );
+  }
+
+  getNearMeProperties() async {
+    emit(LoadingGetNearMePropertiesState());
+    var request = await useCase.callGetNearMeProperties();
+
+    request.fold(
+          (response) => emit(SuccessGetNearMePropertiesState(response)),
+          (error) => emit(ErrorGetNearMePropertiesState(error)),
     );
   }
 }
@@ -38,4 +49,19 @@ class SuccessGetPropertiesState extends GetPropertiesState {
 class ErrorGetPropertiesState extends GetPropertiesState {
   final String error;
   ErrorGetPropertiesState(this.error);
+}
+
+
+class InitGetNearMePropertiesState extends GetPropertiesState {}
+
+class LoadingGetNearMePropertiesState extends GetPropertiesState {}
+
+class SuccessGetNearMePropertiesState extends GetPropertiesState {
+  final List<PropertyEntity> propertyResponseEntity;
+  SuccessGetNearMePropertiesState(this.propertyResponseEntity);
+}
+
+class ErrorGetNearMePropertiesState extends GetPropertiesState {
+  final String error;
+  ErrorGetNearMePropertiesState(this.error);
 }

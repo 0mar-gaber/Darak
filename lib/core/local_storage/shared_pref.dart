@@ -23,6 +23,20 @@ class PrefsHelper{
     return sharedPreferences.getString("phone number");
   }
 
+ static setCity(String city){
+    sharedPreferences.setString("City", city);
+  }
+  static getCity(){
+    return sharedPreferences.getString("City");
+  }
+
+  static setGovernorate(String governorate) {
+    sharedPreferences.setString("governorate", governorate);
+  }
+
+  static getGovernorate() {
+    return sharedPreferences.getString("governorate");
+  }
 
   static setUserId(String userId){
     sharedPreferences.setString("user id", userId);

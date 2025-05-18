@@ -42,9 +42,9 @@ class ProfileImpl extends ProfileContract {
         endPoint: EndPoint.updateUserDetailsEndPoint,
         token: PrefsHelper.getToken(),
         body: {
-          "phoneNumber": phoneNumber,
           "bio": userName,
-          "gender": gender
+          "governorate": phoneNumber,
+          "city": gender
         },
       );
       if (request.statusCode == 200) {

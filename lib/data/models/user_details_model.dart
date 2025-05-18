@@ -8,6 +8,8 @@ class UserDetailsModel {
   final String bio;
   final String gender;
   final String profilePictureUrl;
+  final String city;
+  final String governorate;
 
   UserDetailsModel({
     required this.id,
@@ -17,9 +19,11 @@ class UserDetailsModel {
     required this.bio,
     required this.gender,
     required this.profilePictureUrl,
+    required this.city,
+    required this.governorate,
   });
 
-  // Factory method لتحويل JSON إلى كائن من نوع UserModel
+  // Factory method لتحويل JSON إلى كائن من نوع UserDetailsModel
   factory UserDetailsModel.fromJson(Map<String, dynamic> json) {
     return UserDetailsModel(
       id: json['id'] ?? '',
@@ -29,6 +33,8 @@ class UserDetailsModel {
       bio: json['bio'] ?? '',
       gender: json['gender'] ?? '',
       profilePictureUrl: json['profilePictureUrl'] ?? '',
+      city: json['city'] ?? '',
+      governorate: json['governorate'] ?? '',
     );
   }
 
@@ -42,6 +48,8 @@ class UserDetailsModel {
       'bio': bio,
       'gender': gender,
       'profilePictureUrl': profilePictureUrl,
+      'city': city,
+      'governorate': governorate,
     };
   }
 }

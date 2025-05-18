@@ -9,6 +9,7 @@ import 'package:real_their/presentation/view_models/favourite_view_model/favouri
 
 import 'core/DI/di.dart';
 import 'core/api/api_manger.dart';
+import 'core/get_current_location.dart';
 import 'core/local_storage/shared_pref.dart';
 
 Future<void> main() async {
@@ -18,8 +19,26 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await PrefsHelper.init();
   ApiManager.init();
-
+  await _fetchAndStoreLocation();
   runApp(AppWrapper());
+}
+Future<void> _fetchAndStoreLocation() async {
+  final locationHelper = GetCurrentLocation();
+  final result = await locationHelper.getCurrentLocationWithCityAndAdminArea();
+  final position = result.$1;
+  final error = result.$2;
+  final city = result.$3;
+  final adminArea = result.$4;
+
+  if (position != null && error == null) {
+    // اطبع المدينة والمحافظة مع بعض
+    print('City: $result');
+    print('Admin Area (Province): $adminArea');
+
+    // هنا ممكن تخزنها في Shared Preferences أو تستخدمها بأي طريقة تناسبك
+  } else {
+    print("Error getting location or permission: $error");
+  }
 }
 
 class AppWrapper extends StatelessWidget {

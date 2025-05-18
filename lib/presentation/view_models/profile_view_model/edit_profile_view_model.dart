@@ -28,10 +28,10 @@ class EditProfileViewModel extends Cubit<EditProfileState> {
     );
   }
 
-  editProfile(String userName, String phoneNumber, String gender) async {
+  editProfile(String userName, String city, String governorate) async {
     emit(EditProfileLoading());
 
-    final result = await _profileUseCase.callUpdateProfile(userName,phoneNumber,gender);
+    final result = await _profileUseCase.callUpdateProfile(userName,city,governorate);
 
     result.fold(
             (success) => emit(EditProfileSuccess(success)),

@@ -8,7 +8,10 @@ class GetPropertiesUseCase {
   @factoryMethod
   GetPropertiesUseCase(this.getPropertiesRepo);
 
-  call() {
+  callGetProperties() {
     return getPropertiesRepo.getProperties();
+  }
+  callGetNearMeProperties() {
+    return getPropertiesRepo.getNearMeProperties();
   }
 }

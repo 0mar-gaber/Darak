@@ -40,7 +40,7 @@ class Property {
     return Property(
       id: json['id'] ?? '',
       title: json['title'] ?? '',
-      location: json['location'] ?? '',
+      location: json['city'] ?? '',
       priceFormatted: json['priceFormatted'] ?? '',
       areaFormatted: json['areaFormatted'] ?? '',
       imageUrl: json['imageUrl'] ?? '',

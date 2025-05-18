@@ -24,48 +24,78 @@ class AddListingScreen extends StatefulWidget {
 }
 
 class _AddListingScreenState extends State<AddListingScreen> {
-  final List<XFile> _images = []; // تغيير النوع من List<File> إلى List<XFile>
+  final List<XFile> _images = [];
   final List<String> _amenitiesOptions = [
     'Balcony',
     'Garden',
     'Swimming Pool',
     'Parking',
-    'Elevator'
+    'Elevator',
+    'Air Conditioning',
+    'Security',
+    'Fitness Center',
+    'Pet Friendly',
+    'Fireplace',
   ];
 
   List<String> _selectedAmenities = [];
-
   String? bedRooms = '1';
   String? bathRooms = '1';
   String? flores = '1';
-
   String selectedStatus = "Furnished";
 
-  TextEditingController priceController = TextEditingController(text: "0");
-  TextEditingController nameController = TextEditingController();
-  TextEditingController titleController = TextEditingController();
-  TextEditingController descriptionController = TextEditingController();
-  TextEditingController locationController = TextEditingController();
-  TextEditingController phoneNumberController = TextEditingController();
-  TextEditingController areaController = TextEditingController(text: "0");
-  GlobalKey<FormState> formKay = GlobalKey();
+  // Controllers
+  final TextEditingController priceController = TextEditingController(
+    text: "0",
+  );
+  final TextEditingController nameController = TextEditingController();
+  final TextEditingController titleController = TextEditingController();
+  final TextEditingController descriptionController = TextEditingController();
+  final TextEditingController locationController = TextEditingController();
+  final TextEditingController phoneNumberController = TextEditingController();
+  final TextEditingController areaController = TextEditingController(text: "0");
 
+  final TextEditingController cityController = TextEditingController();
+  final TextEditingController addressLine1Controller = TextEditingController();
+  final TextEditingController addressLine2Controller = TextEditingController();
+  final TextEditingController governorateController = TextEditingController();
+  final TextEditingController postalCodeController = TextEditingController();
 
-  final List<String> options = [
+  final GlobalKey<FormState> formKey = GlobalKey();
+
+  final List<String> furnishingOptions = [
     "Furnished",
     "Semi-furnished",
-    "Not-furnished"
+    "Not-furnished",
   ];
 
-
+  // Image picker
   Future<void> _pickImages() async {
-    final ImagePicker picker = ImagePicker();
-    final List<XFile>? pickedImages = await picker.pickMultiImage();
+    try {
+      final ImagePicker picker = ImagePicker();
+      final List<XFile>? pickedImages = await picker.pickMultiImage(
+        maxWidth: 1920,
+        maxHeight: 1080,
+        imageQuality: 80,
+      );
 
-    if (pickedImages != null) {
-      setState(() {
-        _images.addAll(pickedImages); // إضافة الصور كـ XFile
-      });
+      if (pickedImages != null && pickedImages.isNotEmpty) {
+        setState(() {
+          // Limit to 10 images max
+          final remainingSpace = 10 - _images.length;
+          if (remainingSpace > 0) {
+            _images.addAll(pickedImages.take(remainingSpace));
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('You can only upload up to 10 images')),
+            );
+          }
+        });
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to pick images: ${e.toString()}')),
+      );
     }
   }
 
@@ -75,670 +105,791 @@ class _AddListingScreenState extends State<AddListingScreen> {
     });
   }
 
+  String _getCategoryTitle(int catIndex) {
+    switch (catIndex) {
+      case 1:
+        return "Apartment for sale";
+      case 2:
+        return "Villa for sale";
+      case 3:
+        return "Commercial for sale";
+      default:
+        return "Property for sale";
+    }
+  }
+
+  String _getCategorySvg(int catIndex) {
+    switch (catIndex) {
+      case 1:
+        return "assets/svg/apartment.svg";
+      case 2:
+        return "assets/svg/Villa.svg";
+      case 3:
+        return "assets/svg/Commercial.svg";
+      default:
+        return "assets/svg/property.svg";
+    }
+  }
+
+  String _getPropertyType(int catIndex) {
+    switch (catIndex) {
+      case 1:
+        return "Apartment";
+      case 2:
+        return "Villa";
+      case 3:
+        return "Commercial";
+      default:
+        return "Property";
+    }
+  }
+
+  @override
+  void dispose() {
+    priceController.dispose();
+    nameController.dispose();
+    titleController.dispose();
+    descriptionController.dispose();
+    locationController.dispose();
+    phoneNumberController.dispose();
+    areaController.dispose();
+    cityController.dispose();
+    addressLine1Controller.dispose();
+    addressLine2Controller.dispose();
+    governorateController.dispose();
+    postalCodeController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-
     final int catIndex = ModalRoute.of(context)!.settings.arguments as int;
-    String svgIcon ;
-    String title ;
-    if(catIndex==1){
-      svgIcon = "assets/svg/apartment.svg";
-      title = "Apartment for sale";
-    }else if(catIndex ==2){
-      svgIcon = "assets/svg/Villa.svg";
-      title = "Villa for sale";
-    }else{
-      svgIcon = "assets/svg/Commercial.svg";
-      title = "Commercial for sale";
-    }
+    final svgIcon = _getCategorySvg(catIndex);
+    final title = _getCategoryTitle(catIndex);
+
     return Scaffold(
       body: BlocProvider(
         create: (context) => getIt<AddListingViewModel>(),
         child: SafeArea(
           child: Form(
-            key: formKay,
+            key: formKey,
             child: ListView(
+              padding: REdgeInsets.all(16),
               children: [
-                Padding(
-                  padding: REdgeInsets.all(28),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          IconButton(
-                              onPressed: () => Navigator.pop(context),
-                              icon: Icon(Icons.arrow_back_ios_new,size: 35.sp,)
-
-                          ),
-                          Spacer(),
-                          CircularPercentIndicator(
-                            radius: 28.0,
-                            lineWidth: 9.0,
-                            percent: 0.5,
-                            center: Text(
-                              "1/2",
-                              style: TextStyle(
-                                color: Theme.of(context).colorScheme.primary,
-                                fontSize: 12.sp,
-                                fontWeight: FontWeight.w800,
-                              ),
-                            ),
-                            progressColor: Theme.of(context).colorScheme.primary,
-                            reverse: true,
-                          ),
-                        ],
+                Row(
+                  children: [
+                    IconButton(
+                      icon: Icon(
+                        Icons.arrow_back_ios,
+                        color: Theme.of(context).colorScheme.primary,
                       ),
-                      SizedBox(height: 30.h),
-                      Row(
-                        children: [
-                          SvgPicture.asset(svgIcon),
-                          SizedBox(width: 10.w),
-                          Text(
-                            title,
-                            style: TextStyle(
-                              fontWeight: FontWeight.w400,
-                              color: Colors.black.withOpacity(0.8),
-                              fontSize: 15.sp,
-                            ),
-                          ),
-                          const Spacer(),
-                        ],
-                      ),
-                      SizedBox(height: 20.h),
-                      Container(
-                        width: double.infinity,
-                        height: 250.h,
-                        padding: EdgeInsets.all(8.w),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.black, width: 1.5.w),
-                        ),
-                        child: _images.isEmpty
-                            ? Center(child: Text("No images selected"))
-                            : GridView.builder(
-                          itemCount: _images.length,
-                          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 3,
-                            crossAxisSpacing: 10.w,
-                            mainAxisSpacing: 10.h,
-                          ),
-                          itemBuilder: (context, index) {
-                            return Stack(
-                              children: [
-                                ClipRRect(
-                                  borderRadius: BorderRadius.circular(10.r),
-                                  child: Image.file(
-                                    File(_images[index].path), // تحويل XFile إلى File
-                                    width: double.infinity,
-                                    height: double.infinity,
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                                Positioned(
-                                  top: 4,
-                                  right: 4,
-                                  child: GestureDetector(
-                                    onTap: () => _removeImage(index),
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        color: Colors.black54,
-                                      ),
-                                      child: const Icon(
-                                        Icons.close,
-                                        size: 18,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            );
-                          },
-                        ),
-                      ),
-                      SizedBox(height: 15.h),
-                      Center(
-                        child: InkWell(
-                          onTap: _pickImages,
-                          child: Container(
-                            width: 167.w,
-                            height: 50.h,
-                            decoration: BoxDecoration(
-                              border: Border.all(color: Colors.black, width: 1.2.w),
-                              borderRadius: BorderRadius.circular(5.r),
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: [
-                                Text(
-                                  "Add Images",
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.w400,
-                                    fontSize: 15.sp,
-                                  ),
-                                ),
-                                Icon(Icons.image_outlined),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 25.h),
-                      Text(
-                        "Area *",
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 16.sp,
-                        ),
-                      ),
-                      SizedBox(height: 8.h),
-                      TextFormField(
-                        keyboardType: TextInputType.number,
-                        controller: areaController,
-                        validator: (value) {
-                          if(value==null||value.isEmpty){
-                            return "area is required";
-                          }
-                          return null;
-                        },
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(5.r),
-
-                            borderSide: BorderSide(
-                              width: 2.5.w,
-                              color: Colors.black,
-                            ),
-                          ),
-                          hintText: "Enter area ( m2 )",
-                          hintStyle: TextStyle(
-                            fontSize: 16.sp,
-                            fontWeight: FontWeight.w400,
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 25.h),
-                      Text(
-                        "Amenities *",
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 16.sp,
-                        ),
-                      ),
-                      SizedBox(height: 8.h),
-                      MultiSelectDialogField(
-                        items: _amenitiesOptions
-                            .map((e) => MultiSelectItem<String>(e, e))
-                            .toList(),
-                        initialValue: _selectedAmenities,
-                        title: Text("Select Amenities"),
-                        selectedColor: Theme.of(context).colorScheme.primary,
-                        decoration: BoxDecoration(
-                          border: Border.all(
-                            color: Colors.black,
-                            width: 1.2.w,
-                          ),
-                          borderRadius: BorderRadius.circular(5.r),
-                        ),
-                        buttonIcon: Icon(Icons.arrow_drop_down),
-                        buttonText: Text(
-                          "Select amenities",
-                          style: TextStyle(
-                            fontSize: 16.sp,
-                            fontWeight: FontWeight.w400,
-                          ),
-                        ),
-                        onConfirm: (results) {
-                          setState(() {
-                            _selectedAmenities = results.cast<String>();
-                          });
-                        },
-                        backgroundColor: Colors.white,
-                        dialogHeight: 350.h,
-                        itemsTextStyle: TextStyle(color: Theme.of(context).colorScheme.primary,fontWeight: FontWeight.w500,fontSize: 16.sp),
-                        checkColor: Theme.of(context).colorScheme.primary,
-                        chipDisplay: MultiSelectChipDisplay(
-                          chipColor: Theme.of(context).colorScheme.secondary,
-                          textStyle:TextStyle(color: Theme.of(context).colorScheme.primary,fontWeight: FontWeight.w500,fontSize: 16.sp) ,
-
-                        ),
-                      ),
-                      SizedBox(height: 25.h),
-                      Text(
-                        "Bedrooms *",
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 16.sp,
-                        ),
-                      ),
-                      SizedBox(height: 8.h),
-                      DropdownButtonFormField<String>(
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                          labelText: 'Select an option',
-                        ),
-                        value: bedRooms,
-                        items: ['1', '2', '3','4','5']
-                            .map((option) => DropdownMenuItem(
-                          value: option,
-                          child: Text(option),
-                        ))
-                            .toList(),
-                        onChanged: (value) {
-                          setState(() {
-                            bedRooms = value;
-                          });
-                        },
-                      ),
-                      SizedBox(height: 25.h),
-                      Text(
-                        "Bathrooms *",
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 16.sp,
-                        ),
-                      ),
-                      SizedBox(height: 8.h),
-                      DropdownButtonFormField<String>(
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                          labelText: 'Select an option',
-                        ),
-                        value: bathRooms,
-                        items: ['1', '2', '3','4','5']
-                            .map((option) => DropdownMenuItem(
-                          value: option,
-                          child: Text(option),
-                        ))
-                            .toList(),
-                        onChanged: (value) {
-                          setState(() {
-                            bathRooms = value;
-                          });
-                        },
-                      ),
-                      SizedBox(height: 25.h),
-                      Text(
-                        "Floor *",
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 16.sp,
-                        ),
-                      ),
-                      SizedBox(height: 8.h),
-                      DropdownButtonFormField<String>(
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                          labelText: 'Select an option',
-                        ),
-                        value: flores,
-                        items: ['1', '2', '3','4','5']
-                            .map((option) => DropdownMenuItem(
-                          value: option,
-                          child: Text(option),
-                        ))
-                            .toList(),
-                        onChanged: (value) {
-                          setState(() {
-                            flores = value;
-                          });
-                        },
-                      ),
-                      SizedBox(height: 25.h),
-                      Text(
-                        "Furnish status *",
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 16.sp,
-                        ),
-                      ),
-                      SizedBox(height: 8.h),
-                      Column(
-                        children: options.map((option) {
-                          return GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                selectedStatus = option;
-                              });
-                            },
-                            child: Container(
-                              margin: EdgeInsets.symmetric(vertical: 6.h),
-                              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
-                              decoration: BoxDecoration(
-                                border: Border.all(
-                                  color: Colors.black45,
-                                  width: 1.2,
-                                ),
-                                borderRadius: BorderRadius.circular(8.r),
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    option,
-                                    style: TextStyle(
-                                      fontSize: 15.sp,
-                                      color: Colors.black.withOpacity(0.8),
-                                    ),
-                                  ),
-                                  Icon(
-                                    selectedStatus == option
-                                        ? Icons.radio_button_checked
-                                        : Icons.radio_button_off,
-                                    color: Colors.black54,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          );
-                        }).toList(),
-                      ),
-                      SizedBox(height: 32.h,),
-
-                      // Ad title
-                      Text(
-                        "Add title *",
-                        style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16.sp),
-                      ),
-                      SizedBox(height: 8.h),
-                      TextFormField(
-                        keyboardType: TextInputType.text,
-                        controller: titleController,
-                        validator: (value) {
-                          if(value==null||value.isEmpty){
-                            return "title is required";
-                          }
-                          return null;
-                        },
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(5.r),
-                            borderSide: BorderSide(width: 2.5.w, color: Colors.black),
-                          ),
-                          hintText: "Enter title",
-                          hintStyle: TextStyle(
-                            fontSize: 16.sp,
-                            fontWeight: FontWeight.w400,
-                          ),
-                        ),
-                      ),
-
-                      SizedBox(height: 30.h),
-
-                      // Description
-                      Text(
-                        "Description *",
-                        style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16.sp),
-                      ),
-                      SizedBox(height: 8.h),
-                      TextFormField(
-                        keyboardType: TextInputType.multiline,
-                        maxLines: 6,
-                        minLines: 4,
-                        validator: (value) {
-                          if(value==null||value.isEmpty){
-                            return "description is required";
-                          }
-                          return null;
-                        },
-                        controller: descriptionController,
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(5.r),
-                            borderSide: BorderSide(width: 2.5.w, color: Colors.black),
-                          ),
-                          hintText: "Describe the property you are selling",
-                          hintStyle: TextStyle(
-                            fontSize: 16.sp,
-                            fontWeight: FontWeight.w400,
-                          ),
-                        ),
-                      ),
-
-                      SizedBox(height: 30.h),
-
-                      // Location
-                      Text(
-                        "Location *",
-                        style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16.sp),
-                      ),
-                      SizedBox(height: 8.h),
-
-                      TextFormField(
-                        keyboardType: TextInputType.text,
-                        controller: locationController,
-                        validator: (value) {
-                          if(value==null||value.isEmpty){
-                            return "location is required";
-                          }
-                          return null;
-                        },
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(5.r),
-                            borderSide: BorderSide(width: 2.5.w, color: Colors.black),
-                          ),
-                          hintText: "Enter location",
-                          hintStyle: TextStyle(
-                            fontSize: 16.sp,
-                            fontWeight: FontWeight.w400,
-                          ),
-                        ),
-                      ),
-                      // GestureDetector(
-                      //   onTap: () {
-                      //     // Navigate to location picker
-                      //   },
-                      //   child: Container(
-                      //     padding: REdgeInsets.symmetric(horizontal: 16, vertical: 18),
-                      //     decoration: BoxDecoration(
-                      //       border: Border.all(width: 1.5.w, color: Colors.black),
-                      //       borderRadius: BorderRadius.circular(5.r),
-                      //     ),
-                      //     child: Row(
-                      //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      //       children: [
-                      //         Text(
-                      //           "Choose location",
-                      //           style: TextStyle(
-                      //             fontSize: 16.sp,
-                      //             fontWeight: FontWeight.w400,
-                      //             color: Colors.black54,
-                      //           ),
-                      //         ),
-                      //         Icon(Icons.arrow_forward_ios, size: 16.sp),
-                      //       ],
-                      //     ),
-                      //   ),
-                      // ),
-
-                      SizedBox(height: 30.h),
-
-                      // Price
-                      Text(
-                        "Price *",
-                        style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16.sp),
-                      ),
-                      SizedBox(height: 8.h),
-                      TextFormField(
-                        keyboardType: TextInputType.number,
-                        controller: priceController,
-                        validator: (value) {
-                          if(value==null||value.isEmpty){
-                            return "price is required";
-                          }
-                          return null;
-                        },
-                        decoration: InputDecoration(
-                          hintText: "Enter price",
-                          hintStyle: TextStyle(
-                            fontSize: 16.sp,
-                            fontWeight: FontWeight.w400,
-                          ),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(5.r),
-                            borderSide: BorderSide(width: 2.5.w, color: Colors.black),
-                          ),
-                        ),
-                      ),
-
-                      SizedBox(height: 30.h),
-
-                      // Name
-                      Text(
-                        "Your name *",
-                        style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16.sp),
-                      ),
-                      SizedBox(height: 8.h),
-                      TextFormField(
-                        controller: nameController,
-                        validator: (value) {
-                          if(value==null||value.isEmpty){
-                            return "your name is required";
-                          }
-                          return null;
-                        },
-                        decoration: InputDecoration(
-                          hintText: "Enter your name",
-                          hintStyle: TextStyle(
-                            fontSize: 16.sp,
-                            fontWeight: FontWeight.w400,
-                          ),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(5.r),
-                            borderSide: BorderSide(width: 2.5.w, color: Colors.black),
-                          ),
-                        ),
-                      ),
-
-                      SizedBox(height: 30.h),
-
-                      // Phone
-                      Text(
-                        "mobile phone *",
-                        style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16.sp),
-                      ),
-                      SizedBox(height: 8.h),
-                      TextFormField(
-                        keyboardType: TextInputType.phone,
-                        controller: phoneNumberController,
-                        validator: (value) {
-                          if(value==null||value.isEmpty){
-                            return "phone number is required";
-                          }
-                          return null;
-                        },
-                        decoration: InputDecoration(
-                          hintText: "Enter your Phone number",
-                          hintStyle: TextStyle(
-                            fontSize: 16.sp,
-                            fontWeight: FontWeight.w400,
-                          ),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(5.r),
-                            borderSide: BorderSide(width: 2.5.w, color: Colors.black),
-                          ),
-                        ),
-                      ),
-
-                      SizedBox(height: 30.h),
-
-                      BlocConsumer<AddListingViewModel,AddListingState>(
-                          builder: (context, state) {
-
-                            if(state is AddListingLoading){
-                              return ElevatedButton(
-                                onPressed: () {
-                                  // Submit form
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  fixedSize: Size(double.maxFinite, 60.h),
-                                  padding: REdgeInsets.symmetric(vertical: 14),
-                                  backgroundColor: Theme.of(context).colorScheme.primary,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8.r),
-                                  ),
-                                ),
-                                child: Center(child: CircularProgressIndicator(color: Colors.white,),),
-                              );
-                            }
-                            return ElevatedButton(
-                              onPressed: () {
-                                if(formKay.currentState!.validate()){
-                                  String type;
-                                  if(catIndex==1){
-                                    type = "Apartment";
-                                  }else if(catIndex ==2){
-                                    type= "Villa";
-                                  }else{
-                                    type = "Commercial";
-                                  }
-
-
-
-                                  Property property = Property(
-                                    title: titleController.text,
-                                    description: descriptionController.text,
-                                    price: double.parse(priceController.text), // 1.5 million
-                                    location: locationController.text,
-                                    yourName: nameController.text,
-                                    mobilePhone: phoneNumberController.text,
-                                    furnishStatus: selectedStatus, // or you can put 'Unfurnished'
-                                    type: type,
-                                    area: double.parse(areaController.text), // 180 square meters
-                                    bathrooms: int.parse(bathRooms!),
-                                    bedrooms: int.parse(bathRooms!),
-                                    amenities: _selectedAmenities, // examples
-                                    files: _images, // leave empty if you don't have images yet
-                                    floor: int.parse(flores!),
-                                  );
-
-                                  AddListingViewModel.get(context).addListing(property,_images);
-
-                                }
-                              },
-                              style: ElevatedButton.styleFrom(
-                                fixedSize: Size(double.maxFinite, 60.h),
-                                padding: REdgeInsets.symmetric(vertical: 14),
-                                backgroundColor: Theme.of(context).colorScheme.primary,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8.r),
-                                ),
-                              ),
-                              child: Text("Post Now", style: TextStyle(fontSize: 20.sp,color: Colors.white,fontWeight: FontWeight.w700)),
-                            );
-                          },
-                          listener: (context, state) {
-                            print(state.toString());
-                            if(state is AddListingError){
-                              print(state.error);
-                            }
-                            if(state is AddListingSuccess){
-
-                              Navigator.pop(context);
-                            }
-                          },
-                      ),
-
-                    ],
-                  ),
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                    ),
+                  ],
                 ),
+                SizedBox(height: 20.h),
+                Row(
+                  children: [
+                    SvgPicture.asset(svgIcon, width: 24.w, height: 23.h),
+                    SizedBox(width: 10.w),
+                    Text(
+                      title,
+                      style: TextStyle(
+                        fontWeight: FontWeight.w500,
+                        color: Colors.black.withOpacity(0.8),
+                        fontSize: 16.sp,
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 20.h),
+
+                // Image upload section
+                _buildImageUploadSection(),
+                SizedBox(height: 25.h),
+
+                // Property details form
+                _buildPropertyDetailsForm(catIndex),
+
+                // Submit button
+                SizedBox(height: 30.h),
+                _buildSubmitButton(catIndex),
               ],
             ),
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildImageUploadSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          "Property Images *",
+          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16.sp),
+        ),
+        SizedBox(height: 8.h),
+        Container(
+          width: double.infinity,
+          height: 250.h,
+          padding: EdgeInsets.all(8.w),
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.black, width: 1.5.w),
+            borderRadius: BorderRadius.circular(10.r),
+          ),
+          child:
+              _images.isEmpty
+                  ? Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.image, size: 50.sp, color: Colors.grey),
+                        SizedBox(height: 10.h),
+                        Text(
+                          "No images selected",
+                          style: TextStyle(color: Colors.grey),
+                        ),
+                      ],
+                    ),
+                  )
+                  : GridView.builder(
+                    itemCount: _images.length,
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 3,
+                      crossAxisSpacing: 10.w,
+                      mainAxisSpacing: 10.h,
+                    ),
+                    itemBuilder: (context, index) {
+                      return Stack(
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(10.r),
+                            child: Image.file(
+                              File(_images[index].path),
+                              width: double.infinity,
+                              height: double.infinity,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                          Positioned(
+                            top: 4,
+                            right: 4,
+                            child: GestureDetector(
+                              onTap: () => _removeImage(index),
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Colors.black54,
+                                ),
+                                child: Icon(
+                                  Icons.close,
+                                  size: 18.sp,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      );
+                    },
+                  ),
+        ),
+        SizedBox(height: 15.h),
+        Center(
+          child: InkWell(
+            onTap: _pickImages,
+            child: Container(
+              width: 167.w,
+              height: 50.h,
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.black, width: 1.2.w),
+                borderRadius: BorderRadius.circular(5.r),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  Text(
+                    "Add Images",
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontWeight: FontWeight.w400,
+                      fontSize: 15.sp,
+                    ),
+                  ),
+                  Icon(Icons.image_outlined),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPropertyDetailsForm(int catIndex) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Area
+        Text(
+          "Area (m²) *",
+          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16.sp),
+        ),
+        SizedBox(height: 8.h),
+        TextFormField(
+          keyboardType: TextInputType.number,
+          controller: areaController,
+          onTap: areaController.clear,
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return "Area is required";
+            }
+            if (double.tryParse(value) == null) {
+              return "Please enter a valid number";
+            }
+            return null;
+          },
+          decoration: InputDecoration(
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(5.r),
+              borderSide: BorderSide(width: 1.5.w, color: Colors.black),
+            ),
+            hintText: "Enter area in square meters",
+            hintStyle: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w400),
+            suffixText: "m²",
+            suffixStyle: TextStyle(
+              fontSize: 24.sp,
+              color: Theme.of(context).colorScheme.primary,
+            ),
+          ),
+        ),
+        SizedBox(height: 25.h),
+
+        // Amenities
+        Text(
+          "Amenities *",
+          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16.sp),
+        ),
+        SizedBox(height: 8.h),
+        MultiSelectDialogField(
+          items:
+              _amenitiesOptions
+                  .map((e) => MultiSelectItem<String>(e, e))
+                  .toList(),
+          initialValue: _selectedAmenities,
+          title: Text("Select Amenities"),
+          selectedColor: Theme.of(context).colorScheme.primary,
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.black, width: 1.2.w),
+            borderRadius: BorderRadius.circular(5.r),
+          ),
+          buttonIcon: Icon(Icons.arrow_drop_down),
+          buttonText: Text(
+            "Select amenities",
+            style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w400),
+          ),
+          onConfirm: (results) {
+            setState(() {
+              _selectedAmenities = results.cast<String>();
+            });
+          },
+          backgroundColor: Colors.white,
+          dialogHeight: 350.h,
+          itemsTextStyle: TextStyle(
+            color: Theme.of(context).colorScheme.primary,
+            fontWeight: FontWeight.w500,
+            fontSize: 16.sp,
+          ),
+          checkColor: Theme.of(context).colorScheme.primary,
+          chipDisplay: MultiSelectChipDisplay(
+            chipColor: Theme.of(context).colorScheme.secondary,
+            textStyle: TextStyle(
+              color: Theme.of(context).colorScheme.primary,
+              fontWeight: FontWeight.w500,
+              fontSize: 16.sp,
+            ),
+          ),
+        ),
+        SizedBox(height: 25.h),
+
+        // Bedrooms, Bathrooms, Floors
+        _buildDropdownField(
+          title: "Bedrooms *",
+          value: bedRooms,
+          items: ['1', '2', '3', '4', '5', '6+'],
+          onChanged: (value) => setState(() => bedRooms = value),
+        ),
+        SizedBox(height: 25.h),
+
+        _buildDropdownField(
+          title: "Bathrooms *",
+          value: bathRooms,
+          items: ['1', '2', '3', '4', '5', '6+'],
+          onChanged: (value) => setState(() => bathRooms = value),
+        ),
+        SizedBox(height: 25.h),
+
+        _buildDropdownField(
+          title: "Floor *",
+          value: flores,
+          items: ['1', '2', '3', '4', '5', '6+', 'Penthouse'],
+          onChanged: (value) => setState(() => flores = value),
+        ),
+        SizedBox(height: 25.h),
+
+        // Furnish status
+        Text(
+          "Furnish status *",
+          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16.sp),
+        ),
+        SizedBox(height: 8.h),
+        Column(
+          children:
+              furnishingOptions.map((option) {
+                return GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      selectedStatus = option;
+                    });
+                  },
+                  child: Container(
+                    margin: EdgeInsets.symmetric(vertical: 6.h),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 16.w,
+                      vertical: 14.h,
+                    ),
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color:
+                            selectedStatus == option
+                                ? Theme.of(context).colorScheme.primary
+                                : Colors.black45,
+                        width: selectedStatus == option ? 1.5 : 1.2,
+                      ),
+                      borderRadius: BorderRadius.circular(8.r),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          option,
+                          style: TextStyle(
+                            fontSize: 15.sp,
+                            color: Colors.black.withOpacity(0.8),
+                          ),
+                        ),
+                        Icon(
+                          selectedStatus == option
+                              ? Icons.radio_button_checked
+                              : Icons.radio_button_off,
+                          color:
+                              selectedStatus == option
+                                  ? Theme.of(context).colorScheme.primary
+                                  : Colors.black54,
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              }).toList(),
+        ),
+        SizedBox(height: 32.h),
+
+        // Ad title
+        Text(
+          "Ad title *",
+          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16.sp),
+        ),
+        SizedBox(height: 8.h),
+        TextFormField(
+          keyboardType: TextInputType.text,
+          controller: titleController,
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return "Title is required";
+            }
+            if (value.length < 10) {
+              return "Title should be at least 10 characters";
+            }
+            return null;
+          },
+          decoration: InputDecoration(
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(5.r),
+              borderSide: BorderSide(width: 1.5.w, color: Colors.black),
+            ),
+            hintText: "Enter a descriptive title for your property",
+            hintStyle: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w400),
+          ),
+        ),
+        SizedBox(height: 30.h),
+
+        // Description
+        Text(
+          "Description *",
+          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16.sp),
+        ),
+        SizedBox(height: 8.h),
+        TextFormField(
+          keyboardType: TextInputType.multiline,
+          maxLines: 6,
+          minLines: 4,
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return "Description is required";
+            }
+            if (value.length < 30) {
+              return "Description should be at least 30 characters";
+            }
+            return null;
+          },
+          controller: descriptionController,
+          decoration: InputDecoration(
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(5.r),
+              borderSide: BorderSide(width: 1.5.w, color: Colors.black),
+            ),
+            hintText:
+                "Describe the property in detail (features, location, etc.)",
+            hintStyle: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w400),
+          ),
+        ),
+        SizedBox(height: 30.h),
+
+        // Location
+        Text(
+          "City *",
+          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16.sp),
+        ),
+        SizedBox(height: 8.h),
+        TextFormField(
+          controller: cityController,
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return "City is required";
+            }
+            return null;
+          },
+          decoration: InputDecoration(
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(5.r),
+              borderSide: BorderSide(width: 1.5.w, color: Colors.black),
+            ),
+            hintText: "Enter city",
+            hintStyle: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w400),
+          ),
+        ),
+        SizedBox(height: 20.h),
+
+        // Address Line 1
+        Text(
+          "Address Line 1 *",
+          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16.sp),
+        ),
+        SizedBox(height: 8.h),
+        TextFormField(
+          controller: addressLine1Controller,
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return "Address is required";
+            }
+            return null;
+          },
+          decoration: InputDecoration(
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(5.r),
+              borderSide: BorderSide(width: 1.5.w, color: Colors.black),
+            ),
+            hintText: "Street address, P.O. box, company name",
+            hintStyle: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w400),
+          ),
+        ),
+        SizedBox(height: 20.h),
+
+        // Address Line 2 (Optional)
+        Text(
+          "Address Line 2",
+          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16.sp),
+        ),
+        SizedBox(height: 8.h),
+        TextFormField(
+          controller: addressLine2Controller,
+          decoration: InputDecoration(
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(5.r),
+              borderSide: BorderSide(width: 1.5.w, color: Colors.black),
+            ),
+            hintText: "Apartment, suite, unit, building, floor, etc.",
+            hintStyle: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w400),
+          ),
+        ),
+        SizedBox(height: 20.h),
+
+        // Governorate/State
+        Text(
+          "Governorate/State *",
+          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16.sp),
+        ),
+        SizedBox(height: 8.h),
+        TextFormField(
+          controller: governorateController,
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return "Governorate is required";
+            }
+            return null;
+          },
+          decoration: InputDecoration(
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(5.r),
+              borderSide: BorderSide(width: 1.5.w, color: Colors.black),
+            ),
+            hintText: "Enter governorate or state",
+            hintStyle: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w400),
+          ),
+        ),
+        SizedBox(height: 20.h),
+
+        // Postal Code
+        Text(
+          "Postal/Zip Code",
+          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16.sp),
+        ),
+        SizedBox(height: 8.h),
+        TextFormField(
+          controller: postalCodeController,
+          keyboardType: TextInputType.number,
+          decoration: InputDecoration(
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(5.r),
+              borderSide: BorderSide(width: 1.5.w, color: Colors.black),
+            ),
+            hintText: "Enter postal or zip code",
+            hintStyle: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w400),
+          ),
+        ),
+        SizedBox(height: 20.h),
+
+        // Price
+        Text(
+          "Price *",
+          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16.sp),
+        ),
+        SizedBox(height: 8.h),
+        TextFormField(
+          keyboardType: TextInputType.number,
+          controller: priceController,
+          onTap: priceController.clear,
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return "Price is required";
+            }
+            if (double.tryParse(value) == null) {
+              return "Please enter a valid number";
+            }
+            return null;
+          },
+          decoration: InputDecoration(
+            hintText: "Enter price in EGP",
+            hintStyle: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w400),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(5.r),
+              borderSide: BorderSide(width: 1.5.w, color: Colors.black),
+            ),
+            suffixText: "\£ ",
+            suffixStyle: TextStyle(
+              fontSize: 24.sp,
+              color: Theme.of(context).colorScheme.primary,
+            ),
+          ),
+        ),
+        SizedBox(height: 30.h),
+
+        // Name
+        Text(
+          "Your name *",
+          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16.sp),
+        ),
+        SizedBox(height: 8.h),
+        TextFormField(
+          controller: nameController,
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return "Your name is required";
+            }
+            return null;
+          },
+          decoration: InputDecoration(
+            hintText: "Enter your full name",
+            hintStyle: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w400),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(5.r),
+              borderSide: BorderSide(width: 1.5.w, color: Colors.black),
+            ),
+          ),
+        ),
+        SizedBox(height: 30.h),
+
+        // Phone
+        Text(
+          "Mobile phone *",
+          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16.sp),
+        ),
+        SizedBox(height: 8.h),
+        TextFormField(
+          keyboardType: TextInputType.phone,
+          controller: phoneNumberController,
+          maxLength: 11,
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return "Phone number is required";
+            }
+            if (!RegExp(r'^[0-9]{10,15}$').hasMatch(value)) {
+              return "Please enter a valid phone number";
+            }
+            return null;
+          },
+          decoration: InputDecoration(
+            hintText: "Enter your phone number",
+            hintStyle: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w400),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(5.r),
+              borderSide: BorderSide(width: 1.5.w, color: Colors.black),
+            ),
+            prefixText: "+ ",
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDropdownField({
+    required String title,
+    required String? value,
+    required List<String> items,
+    required Function(String?) onChanged,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16.sp),
+        ),
+        SizedBox(height: 8.h),
+        DropdownButtonFormField<String>(
+          decoration: InputDecoration(
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8.r),
+            ),
+            contentPadding: EdgeInsets.symmetric(
+              horizontal: 12.w,
+              vertical: 10.h,
+            ),
+          ),
+          value: value,
+          items:
+              items
+                  .map(
+                    (option) =>
+                        DropdownMenuItem(value: option, child: Text(option)),
+                  )
+                  .toList(),
+          onChanged: onChanged,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSubmitButton(int catIndex) {
+    return BlocConsumer<AddListingViewModel, AddListingState>(
+      builder: (context, state) {
+        if (state is AddListingLoading) {
+          return ElevatedButton(
+            onPressed: null,
+            style: ElevatedButton.styleFrom(
+              fixedSize: Size(double.maxFinite, 60.h),
+              backgroundColor: Theme.of(
+                context,
+              ).colorScheme.primary.withOpacity(0.7),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8.r),
+              ),
+            ),
+            child: Center(
+              child: CircularProgressIndicator(color: Colors.white),
+            ),
+          );
+        }
+        return ElevatedButton(
+          onPressed: () {
+
+            if (formKey.currentState!.validate()) {
+              if (_images.isEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Please add at least one image')),
+                );
+                return;
+              }
+
+              final property = Property(
+                title: titleController.text,
+                description: descriptionController.text,
+                price: double.parse(priceController.text),
+                city: cityController.text,
+                addressLine1: addressLine1Controller.text,
+                addressLine2: addressLine2Controller.text,
+                governorate: governorateController.text,
+                postalCode: postalCodeController.text,
+                yourName: nameController.text,
+                mobilePhone: phoneNumberController.text,
+                furnishStatus: selectedStatus,
+                type: _getPropertyType(catIndex),
+                area: double.parse(areaController.text),
+                bathrooms: int.parse(bathRooms!),
+                bedrooms: int.parse(bedRooms!),
+                amenities: _selectedAmenities,
+                files: _images,
+                floor: int.parse(flores!),
+              );
+
+              AddListingViewModel.get(context).addListing(property, _images);
+            }
+          },
+          style: ElevatedButton.styleFrom(
+            fixedSize: Size(double.maxFinite, 60.h),
+            backgroundColor: Theme.of(context).colorScheme.primary,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8.r),
+            ),
+            elevation: 3,
+          ),
+          child: Text(
+            "Post Now",
+            style: TextStyle(
+              fontSize: 20.sp,
+              color: Colors.white,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        );
+      },
+      listener: (context, state) {
+        if (state is AddListingError) {
+         print(state.error);
+        }
+        if (state is AddListingSuccess) {
+          Navigator.pop(context);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Property listed successfully!')),
+          );
+        }
+        print(state);
+      },
     );
   }
 }

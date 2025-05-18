@@ -9,12 +9,31 @@ class ProfileWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print("======================================================");
+    print(image);
+    print("======================================================");
     return Column(
       children: [
         CircleAvatar(
           backgroundColor: Colors.black,
-          backgroundImage: NetworkImage(image),
           radius: 80.r,
+          child: ClipOval(
+            child: Image.network(
+              image != "" ? image : "https://img.freepik.com/free-vector/blue-circle-with-white-user_78370-4707.jpg?semt=ais_hybrid&w=740",
+              width: 160.r,
+              height: 160.r,
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) {
+                // لو فيه مشكلة في تحميل الصورة، هنا نعرض الصورة البديلة
+                return Image.network(
+                  "https://img.freepik.com/free-vector/blue-circle-with-white-user_78370-4707.jpg?semt=ais_hybrid&w=740",
+                  width: 160.r,
+                  height: 160.r,
+                  fit: BoxFit.cover,
+                );
+              },
+            ),
+          ),
         ),
         SizedBox(
           height: 8,

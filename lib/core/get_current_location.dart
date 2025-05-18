@@ -50,4 +50,34 @@ class GetCurrentLocation {
       return (null, 'geocodingError', null);
     }
   }
+
+  Future<(Position?, String?, String?, String?)> getCurrentLocationWithCityAndAdminArea() async {
+    bool permission = await _requestPermission();
+    if (!permission) return (null, 'noPermission', null, null);
+
+    bool service = await _requestService();
+    if (!service) return (null, 'noService', null, null);
+
+    try {
+      final Position location = await Geolocator.getCurrentPosition();
+
+      List<Placemark> placemarks = await placemarkFromCoordinates(
+        location.latitude,
+        location.longitude,
+      );
+
+      if (placemarks.isNotEmpty) {
+        final placemark = placemarks.first;
+        String city = placemark.locality ?? 'Unknown';
+        String adminArea = placemark.administrativeArea ?? 'Unknown';
+        return (location, null, city, adminArea);
+      } else {
+        return (location, null, 'Unknown', 'Unknown');
+      }
+    } catch (e) {
+      print('Reverse geocoding error: $e');
+      return (null, 'geocodingError', null, null);
+    }
+  }
+
 }

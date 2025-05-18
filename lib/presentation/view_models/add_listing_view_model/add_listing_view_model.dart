@@ -39,7 +39,7 @@ class AddListingLoading extends AddListingState {}
 
 
 class AddListingSuccess extends AddListingState {
-  final PropertyEntity propertyEntity;
+  final String propertyEntity;
   AddListingSuccess(this.propertyEntity);
 }
 

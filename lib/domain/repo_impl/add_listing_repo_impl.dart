@@ -14,28 +14,10 @@ class AddListingRepoImpl extends AddListingRepo {
   AddListingRepoImpl(this.contract);
 
   @override
-  Future<Either<PropertyEntity, String>> addListing(Property property ,List<XFile>? images) async {
+  Future<Either<String, String>> addListing(Property property ,List<XFile>? images) async {
     var result = await contract.addListing(property,images);
     return result.fold((response) {
-      PropertyEntity pro = PropertyEntity(
-        id: response.id,
-        title: response.title,
-        description: response.description,
-        price: response.price,
-        type: response.type,
-        location: response.location,
-        bedrooms: response.bedrooms,
-        bathrooms: response.bathrooms,
-        floor: response.floor,
-        images: response.images,
-        area: response.area,
-        furnishStatus: response.furnishStatus,
-        amenities: response.amenities,
-        shortDescription: response.shortDescription,
-        priceFormatted: response.priceFormatted,
-        locationShort: response.locationShort,
-      );
-      return Left(pro);
+      return Left("done");
     }, (error) => Right(error));
   }
 }
