@@ -54,4 +54,20 @@ class GetPropertiesImpl extends GetPropertiesContract {
     }
   }
 
+  @override
+  Future<Either<PropertyModel, String>> getPropertiesById(String id) async {
+    try {
+      final response = await apiManager.getRequest(
+        endPoint: "${EndPoint.getPropertiesByIdEndPoint}/$id", // استخدم الـ endpoint المناسب
+        token: PrefsHelper.getToken(),
+      );
+
+      final property = PropertyModel.fromJson(response);
+      return Left(property);
+    } catch (error) {
+      return Right(error.toString());
+    }
+  }
+
+
 }

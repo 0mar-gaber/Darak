@@ -1,8 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:provider/provider.dart';
 
-import '../home/home_screen.dart';
+import '../../../core/constant.dart';
+import '../../../core/shared_provider/home_screen_provider.dart';
 
 class ComparisonDetailsScreen extends StatelessWidget {
   const ComparisonDetailsScreen({super.key});
@@ -11,6 +13,13 @@ class ComparisonDetailsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    HomeScreenProvider homeScreenProvider = Provider.of<HomeScreenProvider>(
+      context,
+    );
+    print("list = ${homeScreenProvider.property.length}");
+    var firstProperty = homeScreenProvider.property[0];
+    var secProperty = homeScreenProvider.property[1];
+    homeScreenProvider.clearProperty();
     return Scaffold(
       body: ListView(
         padding: REdgeInsets.all(20),
@@ -56,31 +65,27 @@ class ComparisonDetailsScreen extends StatelessWidget {
                           ClipRRect(
                             borderRadius: BorderRadius.circular(18.r),
                             child: Image.network(
-                              "https://images.ctfassets.net/pg6xj64qk0kh/2r4QaBLvhQFH1mPGljSdR9/39b737d93854060282f6b4a9b9893202/camden-paces-apartments-buckhead-ga-terraces-living-room-with-den_1.jpg?fm=webp&w=1920",
+                              "${Constant.imageBaseUrl}${firstProperty.images[0]}",
                               width: 170.w,
+                              height: 125.h,
+                              fit: BoxFit.fitWidth,
+                            ),
+                          ),
+                          SizedBox(height: 14.h),
+                          Flexible(
+                            child: Text(
+                              firstProperty.title,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontWeight: FontWeight.w500,
+                                color: Theme.of(context).colorScheme.primary,
+                                fontSize: 18.sp,
+                              ),
                             ),
                           ),
                           SizedBox(height: 14.h),
                           Text(
-                            "Monroe Kogarah",
-                            style: TextStyle(
-                              fontWeight: FontWeight.w500,
-                              color: Theme.of(context).colorScheme.primary,
-                              fontSize: 18.sp,
-                            ),
-                          ),
-                          SizedBox(height: 14.h),
-                          Text(
-                            "2,200,0000 L.E",
-                            style: TextStyle(
-                              fontWeight: FontWeight.w500,
-                              color: Color(0xff605F5F),
-                              fontSize: 16.sp,
-                            ),
-                          ),
-                          SizedBox(height: 14.h),
-                          Text(
-                            "3 Bedrooms",
+                            firstProperty.priceFormatted,
                             style: TextStyle(
                               fontWeight: FontWeight.w500,
                               color: Color(0xff605F5F),
@@ -89,7 +94,7 @@ class ComparisonDetailsScreen extends StatelessWidget {
                           ),
                           SizedBox(height: 14.h),
                           Text(
-                            "2 Bathrooms",
+                            "${firstProperty.bedrooms.toString()} Bedrooms",
                             style: TextStyle(
                               fontWeight: FontWeight.w500,
                               color: Color(0xff605F5F),
@@ -98,7 +103,16 @@ class ComparisonDetailsScreen extends StatelessWidget {
                           ),
                           SizedBox(height: 14.h),
                           Text(
-                            "150m",
+                            "${firstProperty.bathrooms.toString()} Bathrooms",
+                            style: TextStyle(
+                              fontWeight: FontWeight.w500,
+                              color: Color(0xff605F5F),
+                              fontSize: 16.sp,
+                            ),
+                          ),
+                          SizedBox(height: 14.h),
+                          Text(
+                            "${firstProperty.area.toInt()}m",
                             style: TextStyle(
                               fontWeight: FontWeight.w500,
                               color: Color(0xff605F5F),
@@ -123,31 +137,27 @@ class ComparisonDetailsScreen extends StatelessWidget {
                           ClipRRect(
                             borderRadius: BorderRadius.circular(18.r),
                             child: Image.network(
-                              "https://images.ctfassets.net/pg6xj64qk0kh/2r4QaBLvhQFH1mPGljSdR9/39b737d93854060282f6b4a9b9893202/camden-paces-apartments-buckhead-ga-terraces-living-room-with-den_1.jpg?fm=webp&w=1920",
+                              "${Constant.imageBaseUrl}${secProperty.images[0]}",
                               width: 170.w,
+                              height: 125.h,
+                              fit: BoxFit.fitWidth,
+                            ),
+                          ),
+                          SizedBox(height: 14.h),
+                          Flexible(
+                            child: Text(
+                              secProperty.title,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontWeight: FontWeight.w500,
+                                color: Theme.of(context).colorScheme.primary,
+                                fontSize: 18.sp,
+                              ),
                             ),
                           ),
                           SizedBox(height: 14.h),
                           Text(
-                            "Monroe Kogarah",
-                            style: TextStyle(
-                              fontWeight: FontWeight.w500,
-                              color: Theme.of(context).colorScheme.primary,
-                              fontSize: 18.sp,
-                            ),
-                          ),
-                          SizedBox(height: 14.h),
-                          Text(
-                            "2,200,0000 L.E",
-                            style: TextStyle(
-                              fontWeight: FontWeight.w500,
-                              color: Color(0xff605F5F),
-                              fontSize: 16.sp,
-                            ),
-                          ),
-                          SizedBox(height: 14.h),
-                          Text(
-                            "3 Bedrooms",
+                            secProperty.priceFormatted,
                             style: TextStyle(
                               fontWeight: FontWeight.w500,
                               color: Color(0xff605F5F),
@@ -156,7 +166,7 @@ class ComparisonDetailsScreen extends StatelessWidget {
                           ),
                           SizedBox(height: 14.h),
                           Text(
-                            "2 Bathrooms",
+                            "${secProperty.bedrooms.toString()} Bedrooms",
                             style: TextStyle(
                               fontWeight: FontWeight.w500,
                               color: Color(0xff605F5F),
@@ -165,7 +175,16 @@ class ComparisonDetailsScreen extends StatelessWidget {
                           ),
                           SizedBox(height: 14.h),
                           Text(
-                            "150m",
+                            "${secProperty.bathrooms.toString()} Bathrooms",
+                            style: TextStyle(
+                              fontWeight: FontWeight.w500,
+                              color: Color(0xff605F5F),
+                              fontSize: 16.sp,
+                            ),
+                          ),
+                          SizedBox(height: 14.h),
+                          Text(
+                            "${secProperty.area.toInt()}m",
                             style: TextStyle(
                               fontWeight: FontWeight.w500,
                               color: Color(0xff605F5F),
@@ -201,25 +220,21 @@ class ComparisonDetailsScreen extends StatelessWidget {
                     // First Column
                     Expanded(
                       child: Column(
-                        children: [
-                          Text(
-                            "parking",
+                        children: firstProperty.amenities.map((item) => Padding(
+                          padding: EdgeInsets.only(bottom: 14.h),
+                          child: Text(
+                            item
+                                .toString()
+                                .replaceAll('[', '')
+                                .replaceAll(']', '')
+                                .trim(),
                             style: TextStyle(
                               fontWeight: FontWeight.w500,
                               color: Color(0xff605F5F),
                               fontSize: 16.sp,
                             ),
                           ),
-                          SizedBox(height: 14.h),
-                          Text(
-                            "Garden",
-                            style: TextStyle(
-                              fontWeight: FontWeight.w500,
-                              color: Color(0xff605F5F),
-                              fontSize: 16.sp,
-                            ),
-                          ),
-                        ],
+                        )).toList(),
                       ),
                     ),
 
@@ -232,37 +247,25 @@ class ComparisonDetailsScreen extends StatelessWidget {
 
                     Expanded(
                       child: Column(
-                        children: [
-
-                          Text(
-                            "parking",
+                        children: secProperty.amenities.map((item) => Padding(
+                          padding: EdgeInsets.only(bottom: 14.h),
+                          child: Text(
+                            item
+                                .toString()
+                                .replaceAll('[', '')
+                                .replaceAll(']', '')
+                                .trim(),
                             style: TextStyle(
                               fontWeight: FontWeight.w500,
                               color: Color(0xff605F5F),
                               fontSize: 16.sp,
                             ),
                           ),
-                          SizedBox(height: 14.h),
-                          Text(
-                            "Gym",
-                            style: TextStyle(
-                              fontWeight: FontWeight.w500,
-                              color: Color(0xff605F5F),
-                              fontSize: 16.sp,
-                            ),
-                          ),
-                          SizedBox(height: 14.h),
-                          Text(
-                            "Swimming Pool",
-                            style: TextStyle(
-                              fontWeight: FontWeight.w500,
-                              color: Color(0xff605F5F),
-                              fontSize: 16.sp,
-                            ),
-                          ),
-                        ],
+                        )).toList(),
                       ),
-                    ),                  ],
+                    ),
+
+                  ],
                 ),
               ),
             ),
@@ -271,7 +274,7 @@ class ComparisonDetailsScreen extends StatelessWidget {
 
           SizedBox(height: 35.h),
 
-          Text("Nearby Facilities",style: TextStyle(color: Colors.black,fontSize: 18.sp,fontWeight: FontWeight.w600),textAlign: TextAlign.center,),
+          Text("Location",style: TextStyle(color: Colors.black,fontSize: 18.sp,fontWeight: FontWeight.w600),textAlign: TextAlign.center,),
           SizedBox(height: 8.h),
           Container(
             decoration: BoxDecoration(
@@ -287,26 +290,15 @@ class ComparisonDetailsScreen extends StatelessWidget {
                   children: [
                     // First Column
                     Expanded(
-                      child: Column(
-                        children: [
-                          Text(
-                            "parking",
-                            style: TextStyle(
-                              fontWeight: FontWeight.w500,
-                              color: Color(0xff605F5F),
-                              fontSize: 16.sp,
-                            ),
+                      child: Center(
+                        child: Text(
+                          firstProperty.locationShort,
+                          style: TextStyle(
+                            fontWeight: FontWeight.w500,
+                            color: Color(0xff605F5F),
+                            fontSize: 16.sp,
                           ),
-                          SizedBox(height: 14.h),
-                          Text(
-                            "Garden",
-                            style: TextStyle(
-                              fontWeight: FontWeight.w500,
-                              color: Color(0xff605F5F),
-                              fontSize: 16.sp,
-                            ),
-                          ),
-                        ],
+                        ),
                       ),
                     ),
 
@@ -318,38 +310,19 @@ class ComparisonDetailsScreen extends StatelessWidget {
                     ),
 
                     Expanded(
-                      child: Column(
-                        children: [
-
-                          Text(
-                            "parking",
-                            style: TextStyle(
-                              fontWeight: FontWeight.w500,
-                              color: Color(0xff605F5F),
-                              fontSize: 16.sp,
-                            ),
+                      child: Center(
+                        child: Text(
+                          secProperty.locationShort,
+                          style: TextStyle(
+                            fontWeight: FontWeight.w500,
+                            color: Color(0xff605F5F),
+                            fontSize: 16.sp,
                           ),
-                          SizedBox(height: 14.h),
-                          Text(
-                            "Gym",
-                            style: TextStyle(
-                              fontWeight: FontWeight.w500,
-                              color: Color(0xff605F5F),
-                              fontSize: 16.sp,
-                            ),
-                          ),
-                          SizedBox(height: 14.h),
-                          Text(
-                            "Swimming Pool",
-                            style: TextStyle(
-                              fontWeight: FontWeight.w500,
-                              color: Color(0xff605F5F),
-                              fontSize: 16.sp,
-                            ),
-                          ),
-                        ],
+                        ),
                       ),
-                    ),                  ],
+                    ),
+
+                  ],
                 ),
               ),
             ),

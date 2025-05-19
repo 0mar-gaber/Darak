@@ -16,28 +16,40 @@ class GetPropertiesRepoImpl extends GetPropertiesRepo {
   Future<Either<PropertyResponseEntity, String>> getProperties() async {
     var result = await contract.getProperties();
     return result.fold((response) {
-      var recommended = response.recommendedProperties.map((e) => PropertyItemEntity(
-        id: e.id,
-        title: e.title,
-        location: e.location,
-        priceFormatted: e.priceFormatted,
-        areaFormatted: e.areaFormatted,
-        imageUrl: e.imageUrl,
-      )).toList();
+      var recommended =
+          response.recommendedProperties
+              .map(
+                (e) => PropertyItemEntity(
+                  id: e.id,
+                  title: e.title,
+                  location: e.location,
+                  priceFormatted: e.priceFormatted,
+                  areaFormatted: e.areaFormatted,
+                  imageUrl: e.imageUrl,
+                ),
+              )
+              .toList();
 
-      var all = response.allProperties.map((e) => PropertyItemEntity(
-        id: e.id,
-        title: e.title,
-        location: e.location,
-        priceFormatted: e.priceFormatted,
-        areaFormatted: e.areaFormatted,
-        imageUrl: e.imageUrl,
-      )).toList();
+      var all =
+          response.allProperties
+              .map(
+                (e) => PropertyItemEntity(
+                  id: e.id,
+                  title: e.title,
+                  location: e.location,
+                  priceFormatted: e.priceFormatted,
+                  areaFormatted: e.areaFormatted,
+                  imageUrl: e.imageUrl,
+                ),
+              )
+              .toList();
 
-      return Left(PropertyResponseEntity(
-        recommendedProperties: recommended,
-        allProperties: all,
-      ));
+      return Left(
+        PropertyResponseEntity(
+          recommendedProperties: recommended,
+          allProperties: all,
+        ),
+      );
     }, (error) => Right(error));
   }
 
@@ -46,38 +58,77 @@ class GetPropertiesRepoImpl extends GetPropertiesRepo {
     var result = await contract.getNearMeProperties();
 
     return result.fold((response) {
-      var properties = response.map((e) => PropertyEntity(
-        id: e.id,
-        title: e.title,
-        description: e.description,
-        ownerName: e.ownerName,
-        contactInfo: e.contactInfo,
-        isOwner: e.isOwner,
-        price: e.price,
-        type: e.type,
-        addressLine1: e.addressLine1,
-        addressLine2: e.addressLine2,
-        city: e.city,
-        governorate: e.governorate,
-        postalCode: e.postalCode,
-        bedrooms: e.bedrooms,
-        bathrooms: e.bathrooms,
-        floor: e.floor,
-        images: e.images,
-        area: e.area,
-        furnishStatus: e.furnishStatus,
-        mainImageUrl: e.mainImageUrl,
-        amenities: e.amenities,
-        createdAt: e.createdAt,
-        shortDescription: e.shortDescription,
-        priceFormatted: e.priceFormatted,
-        locationShort: e.locationShort,
-      )).toList();
+      var properties =
+          response
+              .map(
+                (e) => PropertyEntity(
+                  id: e.id,
+                  title: e.title,
+                  description: e.description,
+                  ownerName: e.ownerName,
+                  contactInfo: e.contactInfo,
+                  isOwner: e.isOwner,
+                  price: e.price,
+                  type: e.type,
+                  addressLine1: e.addressLine1,
+                  addressLine2: e.addressLine2,
+                  city: e.city,
+                  governorate: e.governorate,
+                  postalCode: e.postalCode,
+                  bedrooms: e.bedrooms,
+                  bathrooms: e.bathrooms,
+                  floor: e.floor,
+                  images: e.images,
+                  area: e.area,
+                  furnishStatus: e.furnishStatus,
+                  mainImageUrl: e.mainImageUrl,
+                  amenities: e.amenities,
+                  createdAt: e.createdAt,
+                  shortDescription: e.shortDescription,
+                  priceFormatted: e.priceFormatted,
+                  locationShort: e.locationShort,
+                ),
+              )
+              .toList();
 
       return Left(properties);
     }, (error) => Right(error));
   }
 
+  @override
+  Future<Either<PropertyEntity, String>> getPropertiesById(String id) async {
+    var result = await contract.getPropertiesById(id);
 
-
+    return result.fold((property) {
+      return Left(
+        PropertyEntity(
+          id: property.id,
+          title: property.title,
+          description: property.description,
+          ownerName: property.ownerName,
+          contactInfo: property.contactInfo,
+          isOwner: property.isOwner,
+          price: property.price,
+          type: property.type,
+          addressLine1: property.addressLine1,
+          addressLine2: property.addressLine2,
+          city: property.city,
+          governorate: property.governorate,
+          postalCode: property.postalCode,
+          bedrooms: property.bedrooms,
+          bathrooms: property.bathrooms,
+          floor: property.floor,
+          images: property.images,
+          area: property.area,
+          furnishStatus: property.furnishStatus,
+          mainImageUrl: property.mainImageUrl,
+          amenities: property.amenities,
+          createdAt: property.createdAt,
+          shortDescription: property.shortDescription,
+          priceFormatted: property.priceFormatted,
+          locationShort: property.locationShort,
+        ),
+      );
+    }, (error) => Right(error));
+  }
 }

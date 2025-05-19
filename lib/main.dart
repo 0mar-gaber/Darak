@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
@@ -11,17 +12,39 @@ import 'core/DI/di.dart';
 import 'core/api/api_manger.dart';
 import 'core/get_current_location.dart';
 import 'core/local_storage/shared_pref.dart';
+import 'no_internet_app.dart';
 
 Future<void> main() async {
   configureDependencies();
   HttpOverrides.global = MyHttpOverrides();
 
   WidgetsFlutterBinding.ensureInitialized();
+  bool isConnected = await checkInternet();
+
   await PrefsHelper.init();
   ApiManager.init();
   await _fetchAndStoreLocation();
-  runApp(AppWrapper());
+
+  if (isConnected) {
+    runApp(AppWrapper());
+
+  } else {
+    runApp(NoInternetApp()); // شاشة توضح للمستخدم أنه لا يوجد اتصال
+  }
 }
+
+Future<bool> checkInternet() async {
+  var connectivityResult = await (Connectivity().checkConnectivity());
+  if (connectivityResult == ConnectivityResult.mobile || connectivityResult == ConnectivityResult.wifi) {
+    // متصل بالإنترنت
+    return true;
+  } else {
+    // لا يوجد اتصال
+    return false;
+  }
+}
+
+
 Future<void> _fetchAndStoreLocation() async {
   final locationHelper = GetCurrentLocation();
   final result = await locationHelper.getCurrentLocationWithCityAndAdminArea();

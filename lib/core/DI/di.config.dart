@@ -46,13 +46,16 @@ import '../../presentation/view_models/add_listing_view_model/add_listing_view_m
     as _i338;
 import '../../presentation/view_models/auth_view_model/auth_view_model.dart'
     as _i964;
-import '../../presentation/view_models/favourite_view_model/favourite_view_model.dart' as _i784;
+import '../../presentation/view_models/favourite_view_model/favourite_view_model.dart'
+    as _i831;
 import '../../presentation/view_models/home_tab_view_model/home_tab_view_model.dart'
     as _i545;
 import '../../presentation/view_models/profile_view_model/edit_profile_view_model.dart'
     as _i343;
 import '../../presentation/view_models/profile_view_model/profile_view_model.dart'
     as _i879;
+import '../../presentation/view_models/propety_view_model/property_view_model.dart'
+    as _i92;
 import '../../presentation/view_models/search_screen_view_model/search_screen_view_model.dart'
     as _i65;
 import '../api/api_manger.dart' as _i339;
@@ -71,10 +74,6 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i409.AddListingContract>(
       () => _i831.AddListingImpl(gh<_i339.ApiManager>()),
     );
-    gh.factory<_i784.FavouriteViewModel>(
-          () => _i784.FavouriteViewModel(gh<_i784.FavouriteUseCase>()),
-    );
-
     gh.factory<_i906.AddToFavouriteContract>(
       () => _i964.AddToFavouriteImpl(gh<_i339.ApiManager>()),
     );
@@ -143,8 +142,14 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i988.GetSearchPropertiesUseCase>(),
       ),
     );
+    gh.factory<_i831.FavouriteViewModel>(
+      () => _i831.FavouriteViewModel(gh<_i784.FavouriteUseCase>()),
+    );
     gh.factory<_i545.GetPropertiesViewModel>(
       () => _i545.GetPropertiesViewModel(gh<_i82.GetPropertiesUseCase>()),
+    );
+    gh.factory<_i92.GetPropertyByIdViewModel>(
+      () => _i92.GetPropertyByIdViewModel(gh<_i82.GetPropertiesUseCase>()),
     );
     return this;
   }

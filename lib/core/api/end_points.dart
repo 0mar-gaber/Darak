@@ -14,4 +14,6 @@ class EndPoint{
   static const getFavouritesEndPoint = "/api/Favorites";
   static const removeFavouriteEndPoint = "/api/Favorites";
   static const getAllSearchProperty = "/api/Property/GetAllProperties";
+  static const String getPropertiesByIdEndPoint = '/api/Property';
+
 }

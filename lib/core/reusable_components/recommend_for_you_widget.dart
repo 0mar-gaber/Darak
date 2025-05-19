@@ -5,6 +5,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:real_their/core/local_storage/shared_pref.dart';
 import 'package:real_their/presentation/view_models/favourite_view_model/favourite_view_model.dart';
 
+import '../../presentation/screens/Property_details/property_screen.dart';
 import '../constant.dart';
 
 class RecommendForYouWidget extends StatelessWidget {
@@ -30,7 +31,6 @@ class RecommendForYouWidget extends StatelessWidget {
     final userId = PrefsHelper.getUserId();
 
     if (userId == null) {
-      // حالة عدم تسجيل الدخول
       return _buildNotLoggedInWidget(context);
     }
 
@@ -44,15 +44,11 @@ class RecommendForYouWidget extends StatelessWidget {
             (state).loadingPropertyId == id;
 
         return InkWell(
-          onTap: () {
-            if (!isLoading) {
-              if (isLoved) {
-                viewModel.removeFromFavourite(userId, id);
-              } else {
-                viewModel.addToFavourite(userId, id);
-              }
-            }
-          },
+          onTap: () => Navigator.pushNamed(
+            context,
+            PropertyScreen.route,
+            arguments: id,
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -73,28 +69,39 @@ class RecommendForYouWidget extends StatelessWidget {
                       ),
                     ),
                   ),
-                  Padding(
-                    padding: REdgeInsets.all(10),
-                    child: isLoading
-                        ? CircleAvatar(
-                      backgroundColor: isLoved
-                          ? Theme.of(context).colorScheme.primary
-                          : Colors.white,
-                      radius: 18.r,
-                      child: Padding(
-                        padding: REdgeInsets.all(8.0),
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: !isLoved
-                              ? Theme.of(context).colorScheme.primary
-                              : Colors.white,
+                  InkWell(
+                    onTap: () {
+                      if (!isLoading) {
+                        if (isLoved) {
+                          viewModel.removeFromFavourite(userId, id);
+                        } else {
+                          viewModel.addToFavourite(userId, id);
+                        }
+                      }
+                    },
+                    child: Padding(
+                      padding: REdgeInsets.all(10),
+                      child: isLoading
+                          ? CircleAvatar(
+                        backgroundColor: isLoved
+                            ? Theme.of(context).colorScheme.primary
+                            : Colors.white,
+                        radius: 18.r,
+                        child: Padding(
+                          padding: REdgeInsets.all(8.0),
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: !isLoved
+                                ? Theme.of(context).colorScheme.primary
+                                : Colors.white,
+                          ),
                         ),
+                      )
+                          : SvgPicture.asset(
+                        isLoved
+                            ? "assets/svg/selected_heart_icon.svg"
+                            : "assets/svg/heart_icon.svg",
                       ),
-                    )
-                        : SvgPicture.asset(
-                      isLoved
-                          ? "assets/svg/selected_heart_icon.svg"
-                          : "assets/svg/heart_icon.svg",
                     ),
                   ),
                 ],
@@ -251,3 +258,5 @@ class RecommendForYouWidget extends StatelessWidget {
     );
   }
 }
+
+

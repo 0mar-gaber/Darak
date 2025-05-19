@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:real_their/domain/entitys/property_entity.dart';
 
 class PropertyDetailsWidget extends StatelessWidget {
-  const PropertyDetailsWidget({super.key});
+  final PropertyEntity propertyEntity ;
+  const PropertyDetailsWidget({super.key, required this.propertyEntity});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: REdgeInsets.only(left: 34, right: 34, top: 20),
+      margin: REdgeInsets.only(left: 30, right: 30, top: 20),
       height: 120.h,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.all(Radius.circular(16.r)),
@@ -25,7 +27,7 @@ class PropertyDetailsWidget extends StatelessWidget {
                 Flexible(
                   flex: 3,
                   child: Text(
-                    "Modernistic Apartment",
+                    propertyEntity.title,
                     overflow: TextOverflow.ellipsis,
                     maxLines: 1,
                     style: TextStyle(
@@ -35,23 +37,25 @@ class PropertyDetailsWidget extends StatelessWidget {
                         fontWeight: FontWeight.w700),
                   ),
                 ),
-                Flexible(
-                  child: Text(
-                    "\$xxxxx",
-                    style: TextStyle(
-                      color:
-                      Theme.of(context).colorScheme.primary,
-                      fontWeight: FontWeight.w700,
-                      fontSize: 24.sp,
-                      overflow: TextOverflow.ellipsis,
-                    ),
+
+                Text(
+                  propertyEntity.priceFormatted,
+                  style: TextStyle(
+                    color:
+                    Theme.of(context).colorScheme.primary,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 14.sp,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
               ],
             ),
+            SizedBox(
+              height: 5.h,
+            ),
             Flexible(
                 child: Text(
-                    "94 Happy Hollow Road Clinton, NY 282",
+                  propertyEntity.locationShort,
                     style: TextStyle(
                         fontSize: 14.sp,
                         fontWeight: FontWeight.w500,
@@ -65,35 +69,59 @@ class PropertyDetailsWidget extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    SvgPicture.asset("assets/svg/Bedroom.svg"),
-                    SizedBox(
-                      width: 5.w,
-                    ),
                     Text(
-                      "Bedroom",
+                      propertyEntity.bedrooms.toString(),
                       style: TextStyle(
                           color: Theme.of(context)
                               .colorScheme
                               .primary,
                           fontWeight: FontWeight.w600,
                           fontSize: 14.sp),
+                    ),
+                    SizedBox(
+                      width: 15.w,
+                    ),
+                    SvgPicture.asset("assets/svg/Bedroom.svg"),
+                    SizedBox(
+                      width: 8.w,
+                    ),
+                    Text(
+                      "Bedrooms",
+                      style: TextStyle(
+                          color: Theme.of(context)
+                              .colorScheme
+                              .primary,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 10.sp),
                     )
                   ],
                 ),
                 Row(
                   children: [
-                    SvgPicture.asset("assets/svg/Bathroom.svg"),
-                    SizedBox(
-                      width: 5.w,
-                    ),
                     Text(
-                      "Bathroom",
+                      propertyEntity.bathrooms.toString(),
                       style: TextStyle(
                           color: Theme.of(context)
                               .colorScheme
                               .primary,
                           fontWeight: FontWeight.w600,
                           fontSize: 14.sp),
+                    ),
+                    SizedBox(
+                      width: 15.w,
+                    ),
+                    SvgPicture.asset("assets/svg/Bathroom.svg"),
+                    SizedBox(
+                      width: 8.w,
+                    ),
+                    Text(
+                      "Bathrooms",
+                      style: TextStyle(
+                          color: Theme.of(context)
+                              .colorScheme
+                              .primary,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 10.sp),
                     )
                   ],
                 ),
@@ -104,7 +132,7 @@ class PropertyDetailsWidget extends StatelessWidget {
                       width: 5.w,
                     ),
                     Text(
-                      "1360 sqft",
+                      "${propertyEntity.area.toInt()} sqft",
                       style: TextStyle(
                           color: Theme.of(context)
                               .colorScheme
@@ -115,7 +143,10 @@ class PropertyDetailsWidget extends StatelessWidget {
                   ],
                 ),
               ],
-            )
+            ),
+            SizedBox(
+              height: 6.h,
+            ),
           ],
         ),
       ),

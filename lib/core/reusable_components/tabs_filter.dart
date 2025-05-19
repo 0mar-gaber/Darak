@@ -12,17 +12,17 @@ class TabsFilter extends StatelessWidget {
     required this.text,
     required this.index,
     required this.selectedIndex,
-    required this.onTap, // استقبال الدالة
+    required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-        onTap(index); // تحديث المؤشر عند الضغط
+        onTap(index);
       },
       child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
+        padding: EdgeInsets.symmetric(horizontal: 7.w, vertical: 10.h),
         decoration: BoxDecoration(
           color: index == selectedIndex
               ? Theme.of(context).colorScheme.primary
@@ -36,7 +36,7 @@ class TabsFilter extends StatelessWidget {
             textAlign: TextAlign.center,
             style: TextStyle(
               color: index == selectedIndex ? Colors.white : Theme.of(context).colorScheme.primary,
-              fontSize: 15.sp,
+              fontSize: 13.sp,
               fontWeight: FontWeight.w700,
             ),
           ),

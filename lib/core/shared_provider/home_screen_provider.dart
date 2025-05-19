@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:real_their/domain/entitys/favourite_entity.dart';
 import 'package:real_their/domain/entitys/favourite_entity.dart';
 import 'package:real_their/domain/entitys/favourite_entity.dart';
+import 'package:real_their/domain/entitys/property_entity.dart';
 
 import '../../data/models/favourite_property_model.dart';
 import '../reusable_components/filter_model.dart';
@@ -19,14 +20,14 @@ class HomeScreenProvider extends ChangeNotifier {
   }
 
   bool visibility = false;
-  List<int> property = [];
+  List<PropertyEntity> property = [];
 
   // إضافة عقار للمقارنة
-  addToCompare(int propertyId) {
+  addToCompare(PropertyEntity propertyId) {
     visibility = true;
 
     if (!property.contains(propertyId)) {
-      if (property.length >= 2) {
+      if (property.length > 2) {
         property.clear();
       }
       property.add(propertyId);

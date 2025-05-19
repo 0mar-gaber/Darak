@@ -14,4 +14,7 @@ class GetPropertiesUseCase {
   callGetNearMeProperties() {
     return getPropertiesRepo.getNearMeProperties();
   }
+  callGetPropertiesById(String id) {
+    return getPropertiesRepo.getPropertiesById(id);
+  }
 }
