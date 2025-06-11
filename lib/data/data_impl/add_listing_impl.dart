@@ -25,26 +25,7 @@ class AddListingImpl extends AddListingContract {
       var request = await apiManager.postRequest(
         endPoint: EndPoint.addPropertyEndPoint,
         body: pr.toMap(),
-        // body: {
-        //   "title": "Nice Apartment in Nasr City",
-        //   "description": "Spacious 3-bedroom apartment near City Stars.",
-        //   "price": 1500000,
-        //   "addressLine1": "15 Abbas El Akkad",
-        //   "addressLine2": "Building 4",
-        //   "city": "Cairo",
-        //   "governorate": "Cairo",
-        //   "postalCode": "11371",
-        //   "bedrooms": 3,
-        //   "bathrooms": 2,
-        //   "area": 180,
-        //   "yourName": "Omar Gaber",
-        //   "mobilePhone": "01012345678",
-        //   "furnishStatus": "Furnished", // أو "Unfurnished"
-        //   "amenities": ["AC", "Elevator", "Balcony"], // Array
-        //   "floor": 5,
-        //   "type": "Apartment", // أو "Villa" أو حسب القيم المتاحة
-        //   "files": [], // لو هتبعت صور، استخدم MultipartFile هنا
-        // },
+        
         isFormData: true,
         images: pr.files,
         token: PrefsHelper.getToken(),
