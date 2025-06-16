@@ -17,33 +17,45 @@ import '../../data/data_contract/auth_contract.dart' as _i128;
 import '../../data/data_contract/favourite_contract.dart' as _i906;
 import '../../data/data_contract/get_properties_contract.dart' as _i870;
 import '../../data/data_contract/get_search_property_contract.dart' as _i333;
+import '../../data/data_contract/predict_price_contract.dart' as _i703;
 import '../../data/data_contract/profile_contract.dart' as _i450;
+import '../../data/data_contract/suggest_price_contract.dart' as _i841;
 import '../../data/data_impl/add_listing_impl.dart' as _i831;
 import '../../data/data_impl/add_to_favourite_impl.dart' as _i964;
 import '../../data/data_impl/auth_impl.dart' as _i645;
 import '../../data/data_impl/get_properties_impl.dart' as _i514;
 import '../../data/data_impl/get_search_properties_impl.dart' as _i721;
+import '../../data/data_impl/predict_price_impl.dart' as _i638;
 import '../../data/data_impl/profile_impl.dart' as _i331;
+import '../../data/data_impl/suggest_price_impl.dart' as _i54;
 import '../../domain/repo_contract/add_listing_repo.dart' as _i790;
 import '../../domain/repo_contract/auth_repo.dart' as _i233;
 import '../../domain/repo_contract/favourite_repo.dart' as _i704;
 import '../../domain/repo_contract/get_properties_repo.dart' as _i1049;
 import '../../domain/repo_contract/get_search_property_repo.dart' as _i999;
+import '../../domain/repo_contract/predict_price_repo_contract.dart' as _i157;
 import '../../domain/repo_contract/profile_repo_contract.dart' as _i765;
+import '../../domain/repo_contract/suggest_price_repo.dart' as _i504;
 import '../../domain/repo_impl/add_listing_repo_impl.dart' as _i1023;
 import '../../domain/repo_impl/auth_repo_impl.dart' as _i878;
 import '../../domain/repo_impl/favourite_repo_impl.dart' as _i584;
 import '../../domain/repo_impl/get_properties_repo_impl.dart' as _i683;
 import '../../domain/repo_impl/get_serach_property_repo_impl.dart' as _i1028;
+import '../../domain/repo_impl/predict_price_repo_impl.dart' as _i785;
 import '../../domain/repo_impl/profile_repo_impl.dart' as _i943;
+import '../../domain/repo_impl/suggest_price_repo_impl.dart' as _i501;
 import '../../domain/use_cases/add_listing_use_case.dart' as _i634;
 import '../../domain/use_cases/auth_use_case.dart' as _i1063;
 import '../../domain/use_cases/favourite_use_case.dart' as _i784;
 import '../../domain/use_cases/get_properties_use_case.dart' as _i82;
 import '../../domain/use_cases/get_search_properties_use_case.dart' as _i988;
+import '../../domain/use_cases/predict_price_use_case.dart' as _i798;
 import '../../domain/use_cases/profile_use_case.dart' as _i454;
+import '../../domain/use_cases/suggest_price_use_case.dart' as _i514;
 import '../../presentation/view_models/add_listing_view_model/add_listing_view_model.dart'
     as _i338;
+import '../../presentation/view_models/add_listing_view_model/suggest_price_view_model.dart'
+    as _i854;
 import '../../presentation/view_models/auth_view_model/auth_view_model.dart'
     as _i964;
 import '../../presentation/view_models/favourite_view_model/favourite_view_model.dart'
@@ -54,6 +66,8 @@ import '../../presentation/view_models/profile_view_model/edit_profile_view_mode
     as _i343;
 import '../../presentation/view_models/profile_view_model/profile_view_model.dart'
     as _i879;
+import '../../presentation/view_models/propety_view_model/predict_price_view_model.dart'
+    as _i599;
 import '../../presentation/view_models/propety_view_model/property_view_model.dart'
     as _i92;
 import '../../presentation/view_models/search_screen_view_model/search_screen_view_model.dart'
@@ -74,11 +88,17 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i409.AddListingContract>(
       () => _i831.AddListingImpl(gh<_i339.ApiManager>()),
     );
+    gh.factory<_i841.SuggestPriceContract>(
+      () => _i54.SuggestPriceImpl(gh<_i339.ApiManager>()),
+    );
     gh.factory<_i906.AddToFavouriteContract>(
       () => _i964.AddToFavouriteImpl(gh<_i339.ApiManager>()),
     );
     gh.factory<_i450.ProfileContract>(
       () => _i331.ProfileImpl(gh<_i339.ApiManager>()),
+    );
+    gh.factory<_i703.PredictPriceContract>(
+      () => _i638.PredictPriceImpl(gh<_i339.ApiManager>()),
     );
     gh.factory<_i790.AddListingRepo>(
       () => _i1023.AddListingRepoImpl(gh<_i409.AddListingContract>()),
@@ -107,6 +127,9 @@ extension GetItInjectableX on _i174.GetIt {
       () =>
           _i988.GetSearchPropertiesUseCase(gh<_i999.GetSearchPropertiesRepo>()),
     );
+    gh.factory<_i504.SuggestPriceRepo>(
+      () => _i501.SuggestPriceRepoImpl(gh<_i841.SuggestPriceContract>()),
+    );
     gh.factory<_i634.AddListingUseCase>(
       () => _i634.AddListingUseCase(gh<_i790.AddListingRepo>()),
     );
@@ -119,11 +142,17 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i343.EditProfileViewModel>(
       () => _i343.EditProfileViewModel(gh<_i454.ProfileUseCase>()),
     );
+    gh.factory<_i157.PredictPriceRepo>(
+      () => _i785.PredictPriceRepoImpl(gh<_i703.PredictPriceContract>()),
+    );
     gh.factory<_i879.ProfileViewModel>(
       () => _i879.ProfileViewModel(gh<_i454.ProfileUseCase>()),
     );
     gh.factory<_i1049.GetPropertiesRepo>(
       () => _i683.GetPropertiesRepoImpl(gh<_i870.GetPropertiesContract>()),
+    );
+    gh.factory<_i514.SuggestPriceUseCase>(
+      () => _i514.SuggestPriceUseCase(gh<_i504.SuggestPriceRepo>()),
     );
     gh.factory<_i964.AuthViewModel>(
       () => _i964.AuthViewModel(gh<_i1063.AuthUseCase>()),
@@ -145,11 +174,20 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i831.FavouriteViewModel>(
       () => _i831.FavouriteViewModel(gh<_i784.FavouriteUseCase>()),
     );
+    gh.factory<_i798.PredictPriceUseCase>(
+      () => _i798.PredictPriceUseCase(gh<_i157.PredictPriceRepo>()),
+    );
+    gh.factory<_i854.SuggestPriceViewModel>(
+      () => _i854.SuggestPriceViewModel(gh<_i514.SuggestPriceUseCase>()),
+    );
     gh.factory<_i545.GetPropertiesViewModel>(
       () => _i545.GetPropertiesViewModel(gh<_i82.GetPropertiesUseCase>()),
     );
     gh.factory<_i92.GetPropertyByIdViewModel>(
       () => _i92.GetPropertyByIdViewModel(gh<_i82.GetPropertiesUseCase>()),
+    );
+    gh.factory<_i599.PredictPriceViewModel>(
+      () => _i599.PredictPriceViewModel(gh<_i798.PredictPriceUseCase>()),
     );
     return this;
   }

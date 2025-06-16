@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -49,9 +50,10 @@ class PopularNearestYouWidget extends StatelessWidget {
             width: 300.w,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(24.r),
+              color: Colors.black,
               image: DecorationImage(
                 fit: BoxFit.fill,
-                image: NetworkImage(
+                image: CachedNetworkImageProvider(
                   imageUrl != ""
                       ? "${Constant.imageBaseUrl}$imageUrl"
                       : "https://st.hzcdn.com/simgs/acb1c8fb00ad9374_9-4194/home-design.jpg",
@@ -102,7 +104,6 @@ class PopularNearestYouWidget extends StatelessWidget {
                           ),
                         )
                       else
-                      // لو مش مسجل دخول، ممكن تعرض القلب بشكل ثابت أو تعطي أكشن تسجيل الدخول
                         SvgPicture.asset("assets/svg/heart_icon.svg"),
                     ],
                   ),

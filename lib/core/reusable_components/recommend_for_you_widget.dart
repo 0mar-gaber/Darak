@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -62,7 +63,7 @@ class RecommendForYouWidget extends StatelessWidget {
                       borderRadius: BorderRadius.circular(16.r),
                       color: Colors.black,
                       image: DecorationImage(
-                        image: NetworkImage(
+                        image: CachedNetworkImageProvider(
                           "${Constant.imageBaseUrl}$imageUrl",
                         ),
                         fit: BoxFit.fill,
@@ -175,7 +176,7 @@ class RecommendForYouWidget extends StatelessWidget {
                   borderRadius: BorderRadius.circular(16.r),
                   color: Colors.black,
                   image: DecorationImage(
-                    image: NetworkImage(
+                    image: CachedNetworkImageProvider(
                       "${Constant.imageBaseUrl}$imageUrl",
                     ),
                     fit: BoxFit.fill,
@@ -237,26 +238,21 @@ class RecommendForYouWidget extends StatelessWidget {
     );
   }
 
-
   void _showLoginDialog(BuildContext context) {
     showDialog(
       context: context,
-      builder:
-          (context) =>
-          AlertDialog(
-            title: const Text("Login Required"),
-            content: const Text("Please log in first to enable this feature."),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: const Text("OK"),
-              ),
-            ],
+      builder: (context) => AlertDialog(
+        title: const Text("Login Required"),
+        content: const Text("Please log in first to enable this feature."),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: const Text("OK"),
           ),
+        ],
+      ),
     );
   }
 }
-
-

@@ -7,6 +7,7 @@ import 'package:real_their/core/DI/di.dart';
 import 'package:real_their/core/reusable_components/filter_bottom_sheet_widget.dart';
 import 'package:real_their/core/reusable_components/search_result_widget.dart';
 import 'package:real_their/core/reusable_components/text_field.dart';
+import 'package:real_their/presentation/screens/Property_details/property_screen.dart';
 
 import '../../../core/reusable_components/filter_sheet.dart';
 import '../../../core/shared_provider/home_screen_provider.dart';
@@ -165,13 +166,16 @@ class _SearchScreenState extends State<SearchScreen> {
                         separatorBuilder: (context, index) => SizedBox(height: 20.h,),
                         itemBuilder: (context, index) {
                           var property = properties[index];
-                          return SearchResultWidget(
-                            id: property.id,
-                            title: property.title,
-                            location: property.locationShort,
-                            priceFormatted: property.priceFormatted,
-                            imageUrl: property.mainImageUrl,
-                            area: property.area.toString(),
+                          return InkWell(
+                            onTap: () => Navigator.pushNamed(context, PropertyScreen.route,arguments: property.id),
+                            child: SearchResultWidget(
+                              id: property.id,
+                              title: property.title,
+                              location: property.locationShort,
+                              priceFormatted: property.priceFormatted,
+                              imageUrl: property.mainImageUrl,
+                              area: property.area.toString(),
+                            ),
                           );
                         },
                       ),

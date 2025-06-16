@@ -3,9 +3,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:real_their/core/DI/di.dart';
+import 'package:real_their/core/reusable_components/filter_model.dart';
 
 import '../../../../../core/reusable_components/recommend_for_you_widget.dart';
 import '../../../../../core/reusable_components/text_field.dart';
+import '../../../../view_models/search_screen_view_model/search_screen_view_model.dart';
 import '../../../search_screen/search_screen.dart';
 import '../../../../view_models/home_tab_view_model/home_tab_view_model.dart';
 
@@ -15,7 +17,7 @@ class DiscoverTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => getIt<GetPropertiesViewModel>()..getProperties(),
+      create: (context) => getIt<GetSearchPropertiesViewModel>()..getSearchProperties(FilterModel(), ""),
       child: CustomScrollView(
         slivers: [
           // ------- Space from top --------
@@ -81,14 +83,17 @@ class DiscoverTab extends StatelessWidget {
           SliverToBoxAdapter(child: SizedBox(height: 21.h)),
 
           // ------- Properties Grid -------
-          BlocBuilder<GetPropertiesViewModel, GetPropertiesState>(
+          BlocBuilder<GetSearchPropertiesViewModel, GetSearchPropertiesState>(
             builder: (context, state) {
-              if (state is LoadingGetPropertiesState) {
+              if (state is LoadingGetSearchPropertiesState) {
                 return SliverToBoxAdapter(
                   child: SizedBox.shrink(child: Center(child: CircularProgressIndicator())),
                 );
-              } else if (state is SuccessGetPropertiesState) {
-                var properties = state.propertyResponseEntity.recommendedProperties;
+              }
+              if (state is SuccessGetSearchPropertiesState) {
+
+                var properties = state.properties;
+                print('Number of properties: ${properties.length}');
 
                 return SliverPadding(
                   padding: REdgeInsets.symmetric(horizontal: 34.w),
@@ -100,10 +105,10 @@ class DiscoverTab extends StatelessWidget {
                       return RecommendForYouWidget(
                         id: property.id,
                         title: property.title,
-                        location: property.location,
+                        location: property.locationShort,
                         priceFormatted: property.priceFormatted,
-                        imageUrl: property.imageUrl,
-                        area: property.areaFormatted,
+                        imageUrl: property.mainImageUrl,
+                        area: "${property.area} sqft",
                       );
                     },
                     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -114,7 +119,8 @@ class DiscoverTab extends StatelessWidget {
                     ),
                   ),
                 );
-              } else if (state is ErrorGetPropertiesState) {
+              }
+              if (state is ErrorGetSearchPropertiesState) {
                 return SliverToBoxAdapter(
                   child: Center(
                     child: Text(

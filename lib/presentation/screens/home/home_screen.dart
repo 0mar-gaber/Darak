@@ -202,7 +202,7 @@ class HomeScreen extends StatelessWidget {
             SvgPicture.asset("assets/svg/user_not_found.svg",width: 40.w,height: 40.h,color: Theme.of(context).colorScheme.primary,),
             Spacer(),
 
-            Text("No user founded try singing up to view",
+            Text("No user found, try signing up to view your profile.",
               style: TextStyle(
                   color: Theme.of(context).colorScheme.primary,
                   fontWeight: FontWeight.w600,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:introduction_screen/introduction_screen.dart';
 import 'package:real_their/presentation/screens/home/home_screen.dart';
 
@@ -25,16 +26,22 @@ class _OnBoardingState extends State<OnBoarding> {
         decoration: PageDecoration(
           bodyAlignment: Alignment.bottomCenter,
           titleTextStyle:
-              TextStyle(fontSize: 25.sp, fontWeight: FontWeight.bold , color: Theme.of(context).colorScheme.primary),
+          TextStyle(fontSize: 25.sp, fontWeight: FontWeight.bold , color: Theme.of(context).colorScheme.primary),
           bodyTextStyle: TextStyle(fontSize: 17.sp , color: Colors.grey),
-          pageMargin: REdgeInsets.only(
-            top: 310,
-
-          ),
+          pageMargin: REdgeInsets.all(20),
         ),
-        title: "Find The Perfect Place",
+        titleWidget: Column(
+          children: [
+            SvgPicture.asset("assets/svg/House searching-rafiki 1.svg"),
+            Text(
+              "Find The Perfect Place",
+              style: TextStyle(fontSize: 25.sp, fontWeight: FontWeight.bold , color: Theme.of(context).colorScheme.primary),
+            )
+          ],
+        ),
         body: "Find the Ideal place according to your needs and Expectations",
       ),
+
       PageViewModel(
         decoration: PageDecoration(
           bodyAlignment: Alignment.bottomCenter,
@@ -43,20 +50,37 @@ class _OnBoardingState extends State<OnBoarding> {
           bodyTextStyle: TextStyle(fontSize: 17.sp , color: Colors.grey),
           pageMargin: REdgeInsets.all(20),
         ),
-        title: "Book a Place Easily",
-        body: "Book a Real Estate Quickly and Easily with One Click",
+        titleWidget: Column(
+          children: [
+            SvgPicture.asset("assets/svg/Select house-cuate 1.svg"),
+            Text(
+              "Buy a Place Easily",
+              style: TextStyle(fontSize: 25.sp, fontWeight: FontWeight.bold , color: Theme.of(context).colorScheme.primary),
+            )
+          ],
+        ),
+        body: "Buy a Real Estate Quickly and Easily with One Click",
       ),
       PageViewModel(
         decoration: PageDecoration(
           bodyAlignment: Alignment.bottomCenter,
           titleTextStyle:
-              TextStyle(fontSize: 25.sp, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.primary),
+          TextStyle(fontSize: 25.sp, fontWeight: FontWeight.bold , color: Theme.of(context).colorScheme.primary),
           bodyTextStyle: TextStyle(fontSize: 17.sp , color: Colors.grey),
           pageMargin: REdgeInsets.all(20),
         ),
-        title: "Start Living in your Dream Home",
+        titleWidget: Column(
+          children: [
+            SvgPicture.asset("assets/svg/Moving-bro 1.svg"),
+            Text(
+              "Start Living in your Dream Home",
+              style: TextStyle(fontSize: 25.sp, fontWeight: FontWeight.bold , color: Theme.of(context).colorScheme.primary),
+            )
+          ],
+        ),
         body: "Start Searching and Quickly find the Home you were Looking for",
       ),
+
     ];
 
     return Scaffold(

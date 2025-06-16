@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -7,12 +8,14 @@ import 'package:image_picker/image_picker.dart';
 import 'package:multi_select_flutter/chip_display/multi_select_chip_display.dart';
 import 'package:multi_select_flutter/dialog/multi_select_dialog_field.dart';
 import 'package:multi_select_flutter/util/multi_select_item.dart';
-import 'package:percent_indicator/circular_percent_indicator.dart';
-import 'package:real_their/core/reusable_components/property.dart';
+import 'package:real_their/core/reusable_components/property.dart'; // تأكد من المسار الصحيح
 import 'package:real_their/presentation/view_models/add_listing_view_model/add_listing_view_model.dart';
+import 'package:intl/intl.dart';
 
 import '../../../core/DI/di.dart';
-import 'add_listing_2_screen.dart';
+import '../../../core/utils/formatter.dart';
+import '../../../domain/entitys/property_price_suggest_entity.dart'; // تأكد من المسار الصحيح
+import '../../view_models/add_listing_view_model/suggest_price_view_model.dart'; // تأكد من المسار الصحيح
 
 class AddListingScreen extends StatefulWidget {
   const AddListingScreen({super.key});
@@ -168,8 +171,12 @@ class _AddListingScreenState extends State<AddListingScreen> {
     final title = _getCategoryTitle(catIndex);
 
     return Scaffold(
-      body: BlocProvider(
-        create: (context) => getIt<AddListingViewModel>(),
+      body: MultiBlocProvider(
+        providers: [
+          BlocProvider(create: (_) => getIt<AddListingViewModel>()),
+          BlocProvider(create: (_) => getIt<SuggestPriceViewModel>()),
+        ],
+        // تم نقل SafeArea و Form داخل MultiBlocProvider لضمان توفر BlocProviders
         child: SafeArea(
           child: Form(
             key: formKey,
@@ -241,62 +248,61 @@ class _AddListingScreenState extends State<AddListingScreen> {
             border: Border.all(color: Colors.black, width: 1.5.w),
             borderRadius: BorderRadius.circular(10.r),
           ),
-          child:
-              _images.isEmpty
-                  ? Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.image, size: 50.sp, color: Colors.grey),
-                        SizedBox(height: 10.h),
-                        Text(
-                          "No images selected",
-                          style: TextStyle(color: Colors.grey),
-                        ),
-                      ],
+          child: _images.isEmpty
+              ? Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.image, size: 50.sp, color: Colors.grey),
+                SizedBox(height: 10.h),
+                Text(
+                  "No images selected",
+                  style: TextStyle(color: Colors.grey),
+                ),
+              ],
+            ),
+          )
+              : GridView.builder(
+            itemCount: _images.length,
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 3,
+              crossAxisSpacing: 10.w,
+              mainAxisSpacing: 10.h,
+            ),
+            itemBuilder: (context, index) {
+              return Stack(
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(10.r),
+                    child: Image.file(
+                      File(_images[index].path),
+                      width: double.infinity,
+                      height: double.infinity,
+                      fit: BoxFit.cover,
                     ),
-                  )
-                  : GridView.builder(
-                    itemCount: _images.length,
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 3,
-                      crossAxisSpacing: 10.w,
-                      mainAxisSpacing: 10.h,
-                    ),
-                    itemBuilder: (context, index) {
-                      return Stack(
-                        children: [
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(10.r),
-                            child: Image.file(
-                              File(_images[index].path),
-                              width: double.infinity,
-                              height: double.infinity,
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                          Positioned(
-                            top: 4,
-                            right: 4,
-                            child: GestureDetector(
-                              onTap: () => _removeImage(index),
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: Colors.black54,
-                                ),
-                                child: Icon(
-                                  Icons.close,
-                                  size: 18.sp,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      );
-                    },
                   ),
+                  Positioned(
+                    top: 4,
+                    right: 4,
+                    child: GestureDetector(
+                      onTap: () => _removeImage(index),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.black54,
+                        ),
+                        child: Icon(
+                          Icons.close,
+                          size: 18.sp,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
         ),
         SizedBox(height: 15.h),
         Center(
@@ -376,10 +382,9 @@ class _AddListingScreenState extends State<AddListingScreen> {
         ),
         SizedBox(height: 8.h),
         MultiSelectDialogField(
-          items:
-              _amenitiesOptions
-                  .map((e) => MultiSelectItem<String>(e, e))
-                  .toList(),
+          items: _amenitiesOptions
+              .map((e) => MultiSelectItem<String>(e, e))
+              .toList(),
           initialValue: _selectedAmenities,
           title: Text("Select Amenities"),
           selectedColor: Theme.of(context).colorScheme.primary,
@@ -448,54 +453,51 @@ class _AddListingScreenState extends State<AddListingScreen> {
         ),
         SizedBox(height: 8.h),
         Column(
-          children:
-              furnishingOptions.map((option) {
-                return GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      selectedStatus = option;
-                    });
-                  },
-                  child: Container(
-                    margin: EdgeInsets.symmetric(vertical: 6.h),
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 16.w,
-                      vertical: 14.h,
-                    ),
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        color:
-                            selectedStatus == option
-                                ? Theme.of(context).colorScheme.primary
-                                : Colors.black45,
-                        width: selectedStatus == option ? 1.5 : 1.2,
-                      ),
-                      borderRadius: BorderRadius.circular(8.r),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          option,
-                          style: TextStyle(
-                            fontSize: 15.sp,
-                            color: Colors.black.withOpacity(0.8),
-                          ),
-                        ),
-                        Icon(
-                          selectedStatus == option
-                              ? Icons.radio_button_checked
-                              : Icons.radio_button_off,
-                          color:
-                              selectedStatus == option
-                                  ? Theme.of(context).colorScheme.primary
-                                  : Colors.black54,
-                        ),
-                      ],
-                    ),
+          children: furnishingOptions.map((option) {
+            return GestureDetector(
+              onTap: () {
+                setState(() {
+                  selectedStatus = option;
+                });
+              },
+              child: Container(
+                margin: EdgeInsets.symmetric(vertical: 6.h),
+                padding: EdgeInsets.symmetric(
+                  horizontal: 16.w,
+                  vertical: 14.h,
+                ),
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: selectedStatus == option
+                        ? Theme.of(context).colorScheme.primary
+                        : Colors.black45,
+                    width: selectedStatus == option ? 1.5 : 1.2,
                   ),
-                );
-              }).toList(),
+                  borderRadius: BorderRadius.circular(8.r),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      option,
+                      style: TextStyle(
+                        fontSize: 15.sp,
+                        color: Colors.black.withOpacity(0.8),
+                      ),
+                    ),
+                    Icon(
+                      selectedStatus == option
+                          ? Icons.radio_button_checked
+                          : Icons.radio_button_off,
+                      color: selectedStatus == option
+                          ? Theme.of(context).colorScheme.primary
+                          : Colors.black54,
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }).toList(),
         ),
         SizedBox(height: 32.h),
 
@@ -554,7 +556,7 @@ class _AddListingScreenState extends State<AddListingScreen> {
               borderSide: BorderSide(width: 1.5.w, color: Colors.black),
             ),
             hintText:
-                "Describe the property in detail (features, location, etc.)",
+            "Describe the property in detail (features, location, etc.)",
             hintStyle: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w400),
           ),
         ),
@@ -680,33 +682,162 @@ class _AddListingScreenState extends State<AddListingScreen> {
           style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16.sp),
         ),
         SizedBox(height: 8.h),
-        TextFormField(
-          keyboardType: TextInputType.number,
-          controller: priceController,
-          onTap: priceController.clear,
-          validator: (value) {
-            if (value == null || value.isEmpty) {
-              return "Price is required";
-            }
-            if (double.tryParse(value) == null) {
-              return "Please enter a valid number";
-            }
-            return null;
+        // هنا تم إضافة Builder للحصول على context صحيح للـ BlocProvider
+        Builder(
+          builder: (innerContext) { // innerContext هو السياق الجديد
+            return TextFormField(
+              keyboardType: TextInputType.number,
+              controller: priceController,
+              onChanged: (value) {
+                print(cityController.text);
+                final price = num.tryParse(value);
+                if (price == null || areaController.text.isEmpty || bedRooms == null || bathRooms == null || flores == null || cityController.text.isEmpty) return;
+
+                // يجب أن تكون buildingAgeYears قيمة ثابتة أو حقل إدخال
+                // هنا استخدمت 5 بناءً على الكود الأصلي، لكن يفضل جعلها ديناميكية
+                final entity = PropertyPriceSuggestEntity(
+                  areaSqm: num.tryParse(areaController.text) ?? 0,
+                  propertyType: _getPropertyType(catIndex),
+                  bedrooms: int.tryParse(bedRooms!) ?? 0,
+                  bathrooms: int.tryParse(bathRooms!) ?? 0,
+                  buildingAgeYears: 5,
+                  floorLevel: int.tryParse(flores!) ?? 0,
+                  location: "Maadi", // أو LocationController.text لو موجودة
+                  price: price,
+                );
+
+                // استخدام innerContext للوصول لـ ViewModel
+                SuggestPriceViewModel.get(innerContext).suggestPrice(entity);
+              },
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return "Price is required";
+                }
+                if (double.tryParse(value) == null) {
+                  return "Please enter a valid number";
+                }
+                return null;
+              },
+              decoration: InputDecoration(
+                hintText: "Enter price in EGP",
+                hintStyle: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w400),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(5.r),
+                  borderSide: BorderSide(width: 1.5.w, color: Colors.black),
+                ),
+                suffixText: "\£ ",
+                suffixStyle: TextStyle(
+                  fontSize: 24.sp,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+              ),
+            );
           },
-          decoration: InputDecoration(
-            hintText: "Enter price in EGP",
-            hintStyle: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w400),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(5.r),
-              borderSide: BorderSide(width: 1.5.w, color: Colors.black),
-            ),
-            suffixText: "\£ ",
-            suffixStyle: TextStyle(
-              fontSize: 24.sp,
-              color: Theme.of(context).colorScheme.primary,
-            ),
-          ),
         ),
+
+        // باقي الجزء الخاص بالـ BlocBuilder الخاص بـ SuggestPriceViewModel
+        BlocBuilder<SuggestPriceViewModel, SuggestPriceState>(
+          builder: (context, state) {
+            if (state is SuggestPriceLoading) {
+              return Padding(
+                padding: EdgeInsets.only(top: 8.h),
+                child: Row(
+                  children: [
+                    SizedBox(width: 10.w),
+                    SizedBox(width: 18.sp, height: 18.sp, child: CircularProgressIndicator(strokeWidth: 2)),
+                    SizedBox(width: 10.w),
+                    Text("Analyzing...", style: TextStyle(color: Colors.grey)),
+                  ],
+                ),
+              );
+            }
+            if (state is SuggestPriceSuccess) {
+              String getAnalysisLabel(String result) {
+                switch (result) {
+                  case 'Normal':
+                    return 'Great! Your price is in line with the current market for similar properties. ✅';
+                  case 'High Anomaly':
+                    return 'Your price is higher than similar properties in the market. This may make selling harder. ⚠️';
+                  case 'Low Anomaly':
+                    return 'Your price is lower than similar properties in the market. You might be undervaluing your property. ❗️';
+                  default:
+                    return result;
+                }
+              }
+
+              final suggestedPrice = num.tryParse(state.response.suggestedPrice.replaceAll(',', '')) ?? 0;
+
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: EdgeInsets.only(top: 8.h),
+                    child: Text(
+                      getAnalysisLabel(state.response.analysisResult),
+                      style: TextStyle(
+                        color: state.response.analysisResult == 'Normal'
+                            ? Colors.green
+                            : state.response.analysisResult == 'High Anomaly'
+                            ? Colors.orange
+                            : Colors.red,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14.sp,
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 12.h),
+                  Text(
+                    "Suggested Price: ${state.response.suggestedPrice} EGP",
+                    style: TextStyle(
+                      fontSize: 15.sp,
+                      color: Colors.blueGrey,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  SizedBox(height: 8.h),
+                  ElevatedButton.icon(
+                    onPressed: () {
+                      // حط السعر المقترح في الحقل
+                      priceController.text = suggestedPrice.toStringAsFixed(0);
+
+                      // ابعت الطلب تاني للتحليل، بنفس البيانات ولكن بالسعر المقترح
+                      final updatedEntity = PropertyPriceSuggestEntity(
+                        areaSqm: num.tryParse(areaController.text) ?? 0,
+                        propertyType: _getPropertyType(catIndex),
+                        bedrooms: int.tryParse(bedRooms!) ?? 0,
+                        bathrooms: int.tryParse(bathRooms!) ?? 0,
+                        buildingAgeYears: 5,
+                        floorLevel: int.tryParse(flores!) ?? 0,
+                        location: "Maadi", // أو LocationController.text لو موجودة
+                        price: suggestedPrice,
+                      );
+
+                      SuggestPriceViewModel.get(context).suggestPrice(updatedEntity);
+                    },
+                    icon: Icon(Icons.check_circle_outline),
+                    label: Text("Use Suggested Price"),
+                    style: ElevatedButton.styleFrom(
+                      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
+                      backgroundColor: Theme.of(context).colorScheme.secondary,
+                    ),
+                  ),
+                ],
+              );
+            }
+            if (state is SuggestPriceError) {
+              print(state.error);
+              return Padding(
+                padding: EdgeInsets.only(top: 8.h),
+                child: Text(
+                  "sorry we have trouble :( ",
+                  style: TextStyle(color: Colors.red),
+                ),
+              );
+            }
+            return SizedBox.shrink();
+          },
+        ),
+
         SizedBox(height: 30.h),
 
         // Name
@@ -748,6 +879,7 @@ class _AddListingScreenState extends State<AddListingScreen> {
             if (value == null || value.isEmpty) {
               return "Phone number is required";
             }
+            // يمكن تحسين هذا الـ regex ليناسب أرقام الهواتف المصرية تحديدًا
             if (!RegExp(r'^[0-9]{10,15}$').hasMatch(value)) {
               return "Please enter a valid phone number";
             }
@@ -792,13 +924,11 @@ class _AddListingScreenState extends State<AddListingScreen> {
             ),
           ),
           value: value,
-          items:
-              items
-                  .map(
-                    (option) =>
-                        DropdownMenuItem(value: option, child: Text(option)),
-                  )
-                  .toList(),
+          items: items
+              .map(
+                (option) => DropdownMenuItem(value: option, child: Text(option)),
+          )
+              .toList(),
           onChanged: onChanged,
         ),
       ],
@@ -820,18 +950,17 @@ class _AddListingScreenState extends State<AddListingScreen> {
                 borderRadius: BorderRadius.circular(8.r),
               ),
             ),
-            child: Center(
+            child: const Center(
               child: CircularProgressIndicator(color: Colors.white),
             ),
           );
         }
         return ElevatedButton(
           onPressed: () {
-
             if (formKey.currentState!.validate()) {
               if (_images.isEmpty) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Please add at least one image')),
+                  const SnackBar(content: Text('Please add at least one image')),
                 );
                 return;
               }
@@ -880,12 +1009,15 @@ class _AddListingScreenState extends State<AddListingScreen> {
       },
       listener: (context, state) {
         if (state is AddListingError) {
-         print(state.error);
+          print(state.error);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Failed to list property: ${state.error}')),
+          );
         }
         if (state is AddListingSuccess) {
           Navigator.pop(context);
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Property listed successfully!')),
+            const SnackBar(content: Text('Property listed successfully!')),
           );
         }
         print(state);

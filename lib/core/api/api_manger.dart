@@ -25,13 +25,36 @@ class ApiManager {
     };
   }
 
+
+  Dio _getCustomDio(String? baseUrl) {
+    if (baseUrl == null) return dio;
+
+    final customDio = Dio(
+      BaseOptions(
+        baseUrl: baseUrl,
+        validateStatus: (status) => status != null && status < 500,
+      ),
+    );
+
+    (customDio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate =
+        (HttpClient client) {
+      client.badCertificateCallback = (X509Certificate cert, String host, int port) => true;
+      return client;
+    };
+
+    return customDio;
+  }
+
   Future<dynamic> getRequest({
     required String endPoint,
     Map<String, dynamic>? queryParameters,
-    String? token, // ✅ دعم التوكن
+    String? token,
+    String? baseUrl, // ✅
   }) async {
     try {
-      Response response = await dio.get(
+      final customDio = _getCustomDio(baseUrl);
+
+      Response response = await customDio.get(
         endPoint,
         queryParameters: queryParameters,
         options: Options(
@@ -52,38 +75,35 @@ class ApiManager {
     required String endPoint,
     required Map<String, dynamic> body,
     bool isFormData = false,
-    List<XFile>? images,  // إضافة متغير images لتحمل صور متعددة
-    String? token,  // ✅ دعم التوكن
+    List<XFile>? images,
+    String? token,
+    String? baseUrl, // ✅
   }) async {
     try {
       dynamic dataToSend = body;
 
-      // إذا كانت البيانات تحتاج إلى أن تكون في شكل form-data
       if (isFormData) {
-        // إضافة الصور إلى FormData
         FormData formData = FormData();
-
-        // أضف البيانات الأخرى إلى FormData
         body.forEach((key, value) {
           formData.fields.add(MapEntry(key, value.toString()));
         });
 
-        // أضف الصور إلى FormData
         if (images != null) {
           for (var image in images) {
             String fileName = image.path.split('/').last;
             formData.files.add(MapEntry(
-              'files',  // اسم الحقل في الـ API
+              'files',
               await MultipartFile.fromFile(image.path, filename: fileName),
             ));
           }
         }
 
-        // إرسال البيانات
         dataToSend = formData;
       }
 
-      Response response = await dio.post(
+      final customDio = _getCustomDio(baseUrl);
+
+      Response response = await customDio.post(
         endPoint,
         data: dataToSend,
         options: Options(
@@ -102,7 +122,8 @@ class ApiManager {
     required String endPoint,
     Map<String, dynamic>? body,
     bool isFormData = false,
-    String? token, // ✅ دعم التوكن
+    String? token,
+    String? baseUrl, // ✅
   }) async {
     try {
       dynamic dataToSend = body;
@@ -111,7 +132,9 @@ class ApiManager {
         dataToSend = FormData.fromMap(body);
       }
 
-      Response response = await dio.put(
+      final customDio = _getCustomDio(baseUrl);
+
+      Response response = await customDio.put(
         endPoint,
         data: dataToSend,
         options: Options(
@@ -126,11 +149,11 @@ class ApiManager {
     }
   }
 
-
   Future<Response> uploadImageWithToken({
     required String endPoint,
     required XFile imageFile,
     required String token,
+    String? baseUrl, // ✅
   }) async {
     try {
       String fileName = imageFile.path.split('/').last;
@@ -139,7 +162,9 @@ class ApiManager {
         'File': await MultipartFile.fromFile(imageFile.path, filename: fileName),
       });
 
-      Response response = await dio.post(
+      final customDio = _getCustomDio(baseUrl);
+
+      Response response = await customDio.post(
         endPoint,
         data: formData,
         options: Options(
@@ -159,10 +184,13 @@ class ApiManager {
   Future<Response> deleteRequest({
     required String endPoint,
     Map<String, dynamic>? queryParameters,
-    String? token, // ✅ دعم التوكن
+    String? token,
+    String? baseUrl, // ✅
   }) async {
     try {
-      Response response = await dio.delete(
+      final customDio = _getCustomDio(baseUrl);
+
+      Response response = await customDio.delete(
         endPoint,
         queryParameters: queryParameters,
         options: Options(
@@ -175,6 +203,4 @@ class ApiManager {
       throw Exception('Delete request error: $error');
     }
   }
-
-
 }

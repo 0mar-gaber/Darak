@@ -22,6 +22,9 @@ class PrefsHelper{
   static getPhoneNumber(){
     return sharedPreferences.getString("phone number");
   }
+  static clearPhoneNumber(){
+    sharedPreferences.remove("phone number");
+  }
 
  static setCity(String city){
     sharedPreferences.setString("City", city);
@@ -44,4 +47,13 @@ class PrefsHelper{
   static getUserId(){
     return sharedPreferences.getString("user id");
   }
+
+  static clearAll() {
+    sharedPreferences.remove("token");
+    sharedPreferences.remove("phone number");
+    sharedPreferences.remove("City");
+    sharedPreferences.remove("governorate");
+    sharedPreferences.remove("user id");
+  }
+
 }

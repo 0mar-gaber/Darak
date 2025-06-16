@@ -50,12 +50,7 @@ class _SignInScreenState extends State<SignInScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   SizedBox(width: double.infinity),
-                  Row(
-                    children: [
-                      SizedBox(width: 96.w,),
-                      Image(image: AssetImage("assets/png/LOGO2.png")),
-                    ],
-                  ),
+                  Center(child: SvgPicture.asset("assets/svg/logo.svg")),
         
                   
                   SizedBox(height: 50.h,),

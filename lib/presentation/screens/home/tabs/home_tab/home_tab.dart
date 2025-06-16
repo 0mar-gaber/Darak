@@ -58,6 +58,7 @@ class HomeTab extends StatelessWidget {
                           child: Container(
                             decoration: BoxDecoration(
                               color: Color(0xffD8D8D8),
+                              image:DecorationImage(image: AssetImage("assets/png/3bad3a3a-2e21-4f10-9ef4-f8e84571855f.jpg"),fit: BoxFit.cover) ,
                               borderRadius: BorderRadius.only(
                                 topRight: Radius.circular(20.r),
                                 bottomRight: Radius.circular(20.r),

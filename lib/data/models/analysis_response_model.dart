@@ -1,0 +1,26 @@
+class AnalysisResponse {
+  final String analysisResult; // نتيجة التحليل (مثل "Normal")
+  final String suggestedPrice; // السعر المقترح (نص كما في الـ JSON، يمكنك تحويله إلى double لاحقاً إذا احتجت لحسابات)
+
+  // constructor
+  AnalysisResponse({
+    required this.analysisResult,
+    required this.suggestedPrice,
+  });
+
+  // factory constructor لتحويل JSON إلى كائن AnalysisResult
+  factory AnalysisResponse.fromJson(Map<String, dynamic> json) {
+    return AnalysisResponse(
+      analysisResult: json['analysis_result'] as String,
+      suggestedPrice: json['suggested_price'] as String,
+    );
+  }
+
+  // ميثود لتحويل كائن AnalysisResult إلى JSON
+  Map<String, dynamic> toJson() {
+    return {
+      'analysis_result': analysisResult,
+      'suggested_price': suggestedPrice,
+    };
+  }
+}

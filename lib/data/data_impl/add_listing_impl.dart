@@ -1,10 +1,11 @@
+import 'dart:convert';
+
 import 'package:dartz/dartz.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:injectable/injectable.dart';
 import 'package:real_their/core/api/end_points.dart';
 import 'package:real_their/core/local_storage/shared_pref.dart';
 import 'package:real_their/data/data_contract/add_listing_contract.dart';
-import 'package:real_their/data/models/property_model.dart';
 
 import '../../core/api/api_manger.dart';
 import '../../core/reusable_components/property.dart';
@@ -18,35 +19,37 @@ class AddListingImpl extends AddListingContract {
 
   @override
   Future<Either<String, String>> addListing(
-    Property pr,
-    List<XFile>? images,
-  ) async {
+      Property pr,
+      List<XFile>? images,
+      ) async {
     try {
       var request = await apiManager.postRequest(
         endPoint: EndPoint.addPropertyEndPoint,
-        body: pr.toMap(),
-        // body: {
-        //   "title": "Nice Apartment in Nasr City",
-        //   "description": "Spacious 3-bedroom apartment near City Stars.",
-        //   "price": 1500000,
-        //   "addressLine1": "15 Abbas El Akkad",
-        //   "addressLine2": "Building 4",
-        //   "city": "Cairo",
-        //   "governorate": "Cairo",
-        //   "postalCode": "11371",
-        //   "bedrooms": 3,
-        //   "bathrooms": 2,
-        //   "area": 180,
-        //   "yourName": "Omar Gaber",
-        //   "mobilePhone": "01012345678",
-        //   "furnishStatus": "Furnished", // أو "Unfurnished"
-        //   "amenities": ["AC", "Elevator", "Balcony"], // Array
-        //   "floor": 5,
-        //   "type": "Apartment", // أو "Villa" أو حسب القيم المتاحة
-        //   "files": [], // لو هتبعت صور، استخدم MultipartFile هنا
-        // },
+        body: {
+          "PropertyJson": jsonEncode({
+            "title": pr.type,
+            "description": pr.description,
+            "price": pr.price,
+            "addressLine1": pr.addressLine1,
+            "addressLine2": pr.addressLine2,
+            "city": pr.city,
+            "governorate": pr.governorate,
+            "nearbyFacility": "Metro station",
+            "postalCode": pr.postalCode,
+            "bedrooms": pr.bedrooms,
+            "bathrooms": pr.bathrooms,
+            "floor": pr.floor,
+            "area": pr.area,
+            "yourName": pr.yourName,
+            "mobilePhone": pr.mobilePhone,
+            "furnishStatus": pr.furnishStatus,
+            "amenities": pr.amenities,
+            "type": pr.type
+          }),
+          "files" : images
+        },
         isFormData: true,
-        images: pr.files,
+        images: images,
         token: PrefsHelper.getToken(),
       );
 

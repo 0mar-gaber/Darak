@@ -33,7 +33,7 @@ class PropertyDetailsWidget extends StatelessWidget {
                     style: TextStyle(
                         color:
                         Theme.of(context).colorScheme.primary,
-                        fontSize: 20.sp,
+                        fontSize: 18.sp,
                         fontWeight: FontWeight.w700),
                   ),
                 ),
@@ -44,7 +44,7 @@ class PropertyDetailsWidget extends StatelessWidget {
                     color:
                     Theme.of(context).colorScheme.primary,
                     fontWeight: FontWeight.w700,
-                    fontSize: 14.sp,
+                    fontSize: 20.sp,
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),

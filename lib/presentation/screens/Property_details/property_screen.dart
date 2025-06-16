@@ -6,6 +6,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:provider/provider.dart';
 import 'package:real_their/presentation/view_models/propety_view_model/property_view_model.dart';
+import 'package:photo_view/photo_view.dart';
+import 'package:photo_view/photo_view_gallery.dart';
 
 import '../../../core/constant.dart';
 import '../../../core/reusable_components/property_details_widget.dart';
@@ -13,14 +15,25 @@ import '../../../core/reusable_components/seller_details_widget.dart';
 import '../../../core/reusable_components/tabs_filter.dart';
 import '../../../core/shared_provider/home_screen_provider.dart';
 import '../../../../core/DI/di.dart';
+import '../../../domain/entitys/property_request_entity.dart';
+import '../../view_models/propety_view_model/predict_price_view_model.dart';
 import '../comparison_details/comparison_details_screen.dart';
 import '../../view_models/favourite_view_model/favourite_view_model.dart';
 import 'package:real_their/core/local_storage/shared_pref.dart';
 
-class PropertyScreen extends StatelessWidget {
+class PropertyScreen extends StatefulWidget {
   const PropertyScreen({super.key});
 
   static const String route = "PropertyScreen";
+
+  @override
+  State<PropertyScreen> createState() => _PropertyScreenState();
+}
+
+class _PropertyScreenState extends State<PropertyScreen> {
+  bool estimated = false ;
+  final userId = PrefsHelper.getUserId();
+
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +41,6 @@ class PropertyScreen extends StatelessWidget {
     HomeScreenProvider homeScreenProvider = Provider.of<HomeScreenProvider>(
       context,
     );
-    final userId = PrefsHelper.getUserId();
 
     if (homeScreenProvider.property.length == 2) {
       Future.delayed(Duration.zero, () {
@@ -36,10 +48,16 @@ class PropertyScreen extends StatelessWidget {
       });
     }
 
-    return BlocProvider(
-      create:
-          (context) =>
-              getIt<GetPropertyByIdViewModel>()..getPropertyById(propertyId!),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (context) => getIt<GetPropertyByIdViewModel>()..getPropertyById(propertyId!),
+        ),
+        BlocProvider(
+          create: (context) => getIt<PredictPriceViewModel>(),
+        ),
+      ],
+
       child: BlocBuilder<GetPropertyByIdViewModel, GetPropertyByIdState>(
         builder: (context, state) {
           if (state is LoadingGetPropertyByIdState) {
@@ -60,6 +78,7 @@ class PropertyScreen extends StatelessWidget {
                       children: [
                         Stack(
                           children: [
+                            // الصورة الرئيسية هنا
                             Image.network(
                               "${Constant.imageBaseUrl}${property.images[0]}",
                               fit: BoxFit.cover,
@@ -79,22 +98,22 @@ class PropertyScreen extends StatelessWidget {
                                   ),
                                   Spacer(),
                                   BlocBuilder<
-                                    FavouriteViewModel,
-                                    FavouriteState
+                                      FavouriteViewModel,
+                                      FavouriteState
                                   >(
                                     builder: (context, favState) {
                                       final viewModel = FavouriteViewModel.get(
                                         context,
                                       );
                                       final isLoved = viewModel.favourites.any(
-                                        (fav) =>
-                                            fav.propertyId ==
+                                            (fav) =>
+                                        fav.propertyId ==
                                             propertyId.toString(),
                                       );
                                       final isLoading =
                                           favState is FavouriteLoading &&
-                                          favState.loadingPropertyId ==
-                                              propertyId.toString();
+                                              favState.loadingPropertyId ==
+                                                  propertyId.toString();
 
                                       return InkWell(
                                         onTap: () {
@@ -113,39 +132,39 @@ class PropertyScreen extends StatelessWidget {
                                           }
                                         },
                                         child:
-                                            isLoading
-                                                ? CircleAvatar(
-                                                  backgroundColor:
-                                                      isLoved
-                                                          ? Theme.of(
-                                                            context,
-                                                          ).colorScheme.primary
-                                                          : Colors.white,
-                                                  radius: 18.r,
-                                                  child: Padding(
-                                                    padding: REdgeInsets.all(
-                                                      8.0,
-                                                    ),
-                                                    child:
-                                                        CircularProgressIndicator(
-                                                          strokeWidth: 2,
-                                                          color:
-                                                              !isLoved
-                                                                  ? Theme.of(
-                                                                        context,
-                                                                      )
-                                                                      .colorScheme
-                                                                      .primary
-                                                                  : Colors
-                                                                      .white,
-                                                        ),
-                                                  ),
-                                                )
-                                                : SvgPicture.asset(
-                                                  isLoved
-                                                      ? "assets/svg/selected_heart_icon.svg"
-                                                      : "assets/svg/heart_icon.svg",
-                                                ),
+                                        isLoading
+                                            ? CircleAvatar(
+                                          backgroundColor:
+                                          isLoved
+                                              ? Theme.of(
+                                            context,
+                                          ).colorScheme.primary
+                                              : Colors.white,
+                                          radius: 18.r,
+                                          child: Padding(
+                                            padding: REdgeInsets.all(
+                                              8.0,
+                                            ),
+                                            child:
+                                            CircularProgressIndicator(
+                                              strokeWidth: 2,
+                                              color:
+                                              !isLoved
+                                                  ? Theme.of(
+                                                context,
+                                              )
+                                                  .colorScheme
+                                                  .primary
+                                                  : Colors
+                                                  .white,
+                                            ),
+                                          ),
+                                        )
+                                            : SvgPicture.asset(
+                                          isLoved
+                                              ? "assets/svg/selected_heart_icon.svg"
+                                              : "assets/svg/heart_icon.svg",
+                                        ),
                                       );
                                     },
                                   ),
@@ -174,21 +193,21 @@ class PropertyScreen extends StatelessWidget {
                             mainAxisSpacing: 12.h,
                             crossAxisSpacing: 8.w,
                             children:
-                                property.amenities
-                                    .map(
-                                      (facility) => TabsFilter(
-                                        text:
-                                            facility
-                                                .toString()
-                                                .replaceAll('[', '')
-                                                .replaceAll(']', '')
-                                                .trim(),
-                                        index: 0,
-                                        selectedIndex: 999,
-                                        onTap: (_) {},
-                                      ),
-                                    )
-                                    .toList(),
+                            property.amenities
+                                .map(
+                                  (facility) => TabsFilter(
+                                text:
+                                facility
+                                    .toString()
+                                    .replaceAll('[', '')
+                                    .replaceAll(']', '')
+                                    .trim(),
+                                index: 0,
+                                selectedIndex: 999,
+                                onTap: (_) {},
+                              ),
+                            )
+                                .toList(),
                           ),
                         ),
 
@@ -204,24 +223,35 @@ class PropertyScreen extends StatelessWidget {
                             mainAxisSpacing: 12.h,
                             crossAxisSpacing: 8.w,
                             children:
-                                property.images
-                                    .map(
-                                      (img) => Container(
-                                        height: 100.h,
-                                        decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(
-                                            18.r,
-                                          ),
-                                          image: DecorationImage(
-                                            image: NetworkImage(
-                                              "${Constant.imageBaseUrl}$img",
-                                            ),
-                                            fit: BoxFit.cover,
-                                          ),
-                                        ),
+                            // هنا التعديل الرئيسي
+                            List.generate(property.images.length, (index) {
+                              final imageUrl = "${Constant.imageBaseUrl}${property.images[index]}";
+                              return InkWell(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => PhotoGalleryScreen(
+                                        images: property.images.map((img) => "${Constant.imageBaseUrl}$img").toList(),
+                                        initialIndex: index,
                                       ),
-                                    )
-                                    .toList(),
+                                    ),
+                                  );
+                                },
+                                child: Container(
+                                  height: 100.h,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(
+                                      18.r,
+                                    ),
+                                    image: DecorationImage(
+                                      image: NetworkImage(imageUrl),
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                ),
+                              );
+                            }),
                           ),
                         ),
                         SizedBox(height: 30.h),
@@ -233,32 +263,65 @@ class PropertyScreen extends StatelessWidget {
                               padding: REdgeInsets.symmetric(horizontal: 25),
                               child: Row(
                                 mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                MainAxisAlignment.spaceBetween,
                                 children: [
                                   Expanded(
                                     flex: 2,
-                                    child: Container(
-                                      height: 60.h,
-                                      decoration: BoxDecoration(
-                                        color:
-                                            Theme.of(
-                                              context,
-                                            ).colorScheme.primary,
-                                        borderRadius: BorderRadius.circular(
-                                          5.r,
-                                        ),
-                                      ),
-                                      child: Center(
-                                        child: Text(
-                                          "Estimate After 1 Year",
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 18.sp,
-                                            fontWeight: FontWeight.w500,
+                                    child: BlocConsumer<PredictPriceViewModel, PredictPriceState>(
+                                      listener: (context, state) {
+                                        if (state is PredictPriceError) {
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                            SnackBar(content: Text('Prediction failed: ${state.error}')),
+                                          );
+                                        }
+                                      },
+                                      builder: (context, state) {
+                                        return InkWell(
+                                          onTap: () {
+                                            final viewModel = PredictPriceViewModel.get(context);
+
+                                            if (state is! PredictPriceLoading) {
+                                              viewModel.predictPrice(
+                                                PropertyRequestEntity(
+                                                  amenities: property.amenities,
+                                                  bedrooms: property.bedrooms,
+                                                  bathrooms: property.bathrooms,
+                                                  area: property.area,
+                                                  nearbyFacility: [], // ← دي لازم تكون String أو List<String> صح
+                                                  propertyType: property.type,
+                                                ),
+                                              );
+                                            }
+                                          },
+                                          child: Container(
+                                            height: 60.h,
+                                            decoration: BoxDecoration(
+                                              color: state is PredictPriceSuccess
+                                                  ? Colors.white
+                                                  : Theme.of(context).colorScheme.primary,
+                                              borderRadius: BorderRadius.circular(5.r),
+                                            ),
+                                            child: Center(
+                                              child: state is PredictPriceLoading
+                                                  ? CircularProgressIndicator(color: Colors.white, strokeWidth: 2)
+                                                  : Text(
+                                                state is PredictPriceSuccess
+                                                    ? "${state.prediction.predictedPrice2026} EGP"
+                                                    : "Estimate After 1 Year",
+                                                style: TextStyle(
+                                                  color: state is PredictPriceSuccess
+                                                      ? Theme.of(context).colorScheme.primary
+                                                      : Colors.white,
+                                                  fontSize: 18.sp,
+                                                  fontWeight: FontWeight.w500,
+                                                ),
+                                              ),
+                                            ),
                                           ),
-                                        ),
-                                      ),
-                                    ),
+                                        );
+                                      },
+                                    )
+                                    ,
                                   ),
                                   SizedBox(width: 16.w),
                                   Expanded(
@@ -279,23 +342,23 @@ class PropertyScreen extends StatelessWidget {
                                           ),
                                           border: Border.all(
                                             color:
-                                                Theme.of(
-                                                  context,
-                                                ).colorScheme.primary,
+                                            Theme.of(
+                                              context,
+                                            ).colorScheme.primary,
                                             width: 1.w,
                                           ),
                                         ),
                                         child: Row(
                                           mainAxisAlignment:
-                                              MainAxisAlignment.spaceAround,
+                                          MainAxisAlignment.spaceAround,
                                           children: [
                                             Text(
                                               "Compare",
                                               style: TextStyle(
                                                 color:
-                                                    Theme.of(
-                                                      context,
-                                                    ).colorScheme.primary,
+                                                Theme.of(
+                                                  context,
+                                                ).colorScheme.primary,
                                                 fontSize: 15.sp,
                                                 fontWeight: FontWeight.w600,
                                               ),
@@ -326,9 +389,9 @@ class PropertyScreen extends StatelessWidget {
                         child: InkWell(
                           onTap:
                               () =>
-                                  context
-                                      .read<HomeScreenProvider>()
-                                      .clearProperty(),
+                              context
+                                  .read<HomeScreenProvider>()
+                                  .clearProperty(),
                           child: Container(
                             height: 60.h,
                             decoration: BoxDecoration(
@@ -395,5 +458,81 @@ class PropertyScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+class PhotoGalleryScreen extends StatefulWidget {
+  final List<String> images;
+  final int initialIndex;
+
+  const PhotoGalleryScreen({
+    Key? key,
+    required this.images,
+    this.initialIndex = 0,
+  }) : super(key: key);
+
+  @override
+  State<PhotoGalleryScreen> createState() => _PhotoGalleryScreenState();
+}
+
+class _PhotoGalleryScreenState extends State<PhotoGalleryScreen> {
+  late PhotoViewGalleryPageOptions _pageOptions;
+  late PageController _pageController;
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController(initialPage: widget.initialIndex);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Stack(
+        children: [
+          PhotoViewGallery.builder(
+            scrollPhysics: const BouncingScrollPhysics(),
+            builder: (BuildContext context, int index) {
+              return PhotoViewGalleryPageOptions(
+                imageProvider: NetworkImage(widget.images[index]),
+                initialScale: PhotoViewComputedScale.contained * 1.0,
+                heroAttributes: PhotoViewHeroAttributes(tag: widget.images[index]), // إضافة tag لكل صورة
+              );
+            },
+            itemCount: widget.images.length,
+            loadingBuilder: (context, event) => Center(
+              child: SizedBox(
+                width: 20.0,
+                height: 20.0,
+                child: CircularProgressIndicator(
+                  value: event == null
+                      ? 0
+                      : event.cumulativeBytesLoaded / event.expectedTotalBytes!,
+                ),
+              ),
+            ),
+            backgroundDecoration: BoxDecoration(
+              color: Colors.black, // خلفية سوداء للمعرض
+            ),
+            pageController: _pageController,
+          ),
+          // زر الإغلاق
+          Positioned(
+            top: 40,
+            left: 10,
+            child: IconButton(
+              icon: const Icon(Icons.close, color: Colors.white, size: 30),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
   }
 }

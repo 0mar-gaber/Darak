@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:image_picker/image_picker.dart';
 
 class Property {
@@ -22,6 +21,9 @@ class Property {
   String type;
   List<XFile>? files;
 
+  // ✅ الحقل الجديد
+  String? nearbyFacility;
+
   Property({
     required this.title,
     required this.description,
@@ -41,6 +43,7 @@ class Property {
     this.floor,
     required this.type,
     this.files,
+    this.nearbyFacility, // ✅ إضافة الحقل هنا
   });
 
   @override
@@ -64,6 +67,7 @@ Property Details:
 - Bathrooms: $bathrooms
 - Amenities: ${amenities?.join(', ')}
 - Floor: $floor
+- Nearby Facility: $nearbyFacility
 - Images Count: ${files?.length}
 ''';
   }
@@ -87,6 +91,7 @@ Property Details:
       "amenities": amenities,
       "floor": floor,
       "type": type,
+      "nearbyFacility": nearbyFacility, // ✅ إضافة الحقل هنا
     };
   }
 }
